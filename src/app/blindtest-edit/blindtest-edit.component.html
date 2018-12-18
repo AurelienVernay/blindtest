@@ -1,0 +1,44 @@
+<form [formGroup]="blindtestForm" (ngSubmit)="onUpdateBlindtest()">
+    <h1>
+        Modifier le blindtest
+        <mat-form-field [ngStyle]="{ width: '250px' }">
+            <input matInput type="text" formControlName="title" />
+        </mat-form-field>
+        - <i> par </i>
+        <mat-form-field>
+            <input matInput type="text" formControlName="author" />
+        </mat-form-field>
+        <button
+            *ngIf="
+                blindtestForm.controls['title']?.value !== blindtest?.title ||
+                blindtestForm.controls['author']?.value !== blindtest?.author
+            "
+            mat-raised-button
+            color="primary"
+            matTooltip="Valider les changements"
+            [disabled]="!blindtestForm.valid"
+        >
+            <mat-icon>check_outline</mat-icon>
+        </button>
+    </h1>
+</form>
+<app-theme-table
+    *ngFor="let theme of themes"
+    [theme]="theme"
+    (updateTheme)="onUpdateTheme($event)"
+>
+</app-theme-table>
+<button
+    mat-raised-button
+    color="primary"
+    (click)="onAddTheme()"
+    matTooltip="Ajouter un thème"
+>
+    <mat-icon>plus_one</mat-icon>
+</button>
+<app-gloubi-table
+    *ngIf="gloubi"
+    [gloubi]="gloubi"
+    (updateGloubi)="onUpdateGloubi($event)"
+></app-gloubi-table>
+<br />

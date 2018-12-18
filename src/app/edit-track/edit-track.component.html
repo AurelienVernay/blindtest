@@ -1,0 +1,54 @@
+<form [formGroup]="trackForm">
+    <h1 mat-dialog-title>
+        Modifier
+        <mat-form-field>
+            <input matInput type="text" formControlName="title" />
+        </mat-form-field>
+        <i *ngIf="!data.isGloubi"
+            >- par
+            <mat-form-field>
+                <input matInput type="text" formControlName="artists" />
+            </mat-form-field>
+        </i>
+    </h1>
+    <mat-dialog-content> </mat-dialog-content>
+    <div class="container">
+        <button
+            mat-raised-button
+            color="primary"
+            (click)="onFileUploadClicked()"
+        >
+            Importer un fichier
+        </button>
+        <input
+            id="fileInput"
+            type="file"
+            accept=".mp3,.wav,audio/mpeg,audio/mp4,audio/ogg,audio/vnd.wav"
+            (change)="onFileUploaded($event)"
+            style="display:none;"
+        />
+        <i *ngIf="fileLoaded">{{ file.name }}</i>
+        <i *ngIf="previewDuration">{{ previewDuration | timeFormat }}</i>
+    </div>
+    <nouislider
+        *ngIf="fileLoaded"
+        [connect]="true"
+        [min]="0"
+        [max]="previewDuration"
+        [tooltips]="[formatter(), formatter()]"
+        [step]="1"
+        [formControl]="trackForm.controls['durationRange']"
+    ></nouislider>
+    <mat-dialog-actions
+        ><button
+            *ngIf="fileLoaded"
+            mat-mini-fab
+            color="primary"
+            matTooltip="Aperçu de l'extrait"
+            (click)="togglePlay()"
+        >
+            <mat-icon *ngIf="!playing; else pause">play_arrow</mat-icon>
+            <ng-template #pause> <mat-icon>pause</mat-icon> </ng-template>
+        </button></mat-dialog-actions
+    >
+</form>

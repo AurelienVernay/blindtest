@@ -1,18 +1,71 @@
+import { BlindtestService } from './services/blindtest.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { BlindtestsListComponent } from './blindtests-list/blindtests-list.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+
+import { MatListModule } from '@angular/material/list';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BlindtestEditComponent } from './blindtest-edit/blindtest-edit.component';
+import { ThemeTableComponent } from './theme-table/theme-table.component';
+import { GloubiTableComponent } from './gloubi-table/gloubi-table.component';
+import { MatInputModule } from '@angular/material/input';
+import { MatDialogModule } from '@angular/material/dialog';
+import { CreateBlindtestFormComponent } from './create-blindtest-form/create-blindtest-form.component';
+import { AddThemeFormComponent } from './add-theme-form/add-theme-form.component';
+import { EditTrackComponent } from './edit-track/edit-track.component';
+import { ConfirmDeleteTrackComponent } from './confirm-delete-track/confirm-delete-track.component';
+import { NouisliderModule } from 'ng2-nouislider';
+import { TimeFormatPipe } from './pipes/time-format.pipe';
+
+const matModules = [
+    MatListModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatInputModule,
+    MatDialogModule,
+];
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        BlindtestsListComponent,
+        BlindtestEditComponent,
+        ThemeTableComponent,
+        GloubiTableComponent,
+        CreateBlindtestFormComponent,
+        AddThemeFormComponent,
+        EditTrackComponent,
+        ConfirmDeleteTrackComponent,
+        TimeFormatPipe,
+    ],
+    entryComponents: [
+        CreateBlindtestFormComponent,
+        AddThemeFormComponent,
+        EditTrackComponent,
+        ConfirmDeleteTrackComponent,
+    ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        HttpClientModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        ...matModules,
+        NouisliderModule,
+    ],
+    providers: [BlindtestService],
+    bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

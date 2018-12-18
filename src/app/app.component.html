@@ -1,21 +1,10 @@
-<!--The content below is only a placeholder and can be replaced.-->
+<!-- The content below is only a placeholder and can be replaced. -->
 <div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+    <h1>App {{ title }}!</h1>
+    <img
+        width="300"
+        alt="App blindtest logo"
+        src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDUwMCA1MDAiIGhlaWdodD0iNTAwcHgiIGlkPSJMYXllcl8xIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MDAgNTAwIiB3aWR0aD0iNTAwcHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxwYXRoIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMxLjk0OSw0MTguMDgxYzAsMTIuNTM2LDEwLjE3NywyMi43MTYsMjIuNzEzLDIyLjcxNiAgYzEwLjk5MywwLDIwLjE2Ny03LjgxLDIyLjI2MS0xOC4xNzNoMC40NTNjMC05Ljk5MSw4LjE4MS0xOC4xNzIsMTguMTczLTE4LjE3MmM5Ljk4OSwwLDE4LjE3LDguMTgxLDE4LjE3LDE4LjE3MnY5LjA4NyAgYzAsMjAuMDc4LDE2LjI2NCwzNi4zNCwzNi4zNDIsMzYuMzRoMzYuMzRjMjAuMDc5LDAsMzYuMzQzLTE2LjI2MiwzNi4zNDMtMzYuMzRWMjk1LjQyN2MwLTIwLjA3OS0xNi4yNjQtMzYuMzQxLTM2LjM0My0zNi4zNDEgIGgtMzYuMzRjLTIwLjA3OSwwLTM2LjM0MiwxNi4yNjItMzYuMzQyLDM2LjM0MXY5LjA4NmMwLDkuOTkxLTguMTgxLDE4LjE3Mi0xOC4xNywxOC4xNzJjLTkuOTkyLDAtMTguMTczLTguMTgxLTE4LjE3My0xOC4xNzJWMjUwICBjMC05NS4zMDksNzcuMzE2LTE3Mi42MjUsMTcyLjYyNS0xNzIuNjI1UzQyMi42MjQsMTU0LjY5MSw0MjIuNjI0LDI1MHY1NC41MTNjMCw5Ljk5MS04LjE4LDE4LjE3Mi0xOC4xNzIsMTguMTcyICBjLTkuOTg3LDAtMTguMTY4LTguMTgxLTE4LjE2OC0xOC4xNzJ2LTkuMDg2YzAtMjAuMDc5LTE2LjI2Ny0zNi4zNDEtMzYuMzQ2LTM2LjM0MWgtMzYuMzRjLTIwLjA3OCwwLTM2LjM0MSwxNi4yNjItMzYuMzQxLDM2LjM0MSAgdjEzNi4yODRjMCwyMC4wNzgsMTYuMjYzLDM2LjM0LDM2LjM0MSwzNi4zNGgzNi4zNGMyMC4wNzksMCwzNi4zNDYtMTYuMjYyLDM2LjM0Ni0zNi4zNHYtOS4wODdjMC05Ljk5MSw4LjE4MS0xOC4xNzIsMTguMTY4LTE4LjE3MiAgYzkuOTkyLDAsMTguMTcyLDguMTgxLDE4LjE3MiwxOC4xNzJoMC40NTFjMi4wODYsMTAuMzYzLDExLjI3MSwxOC4xNzMsMjIuMjY1LDE4LjE3M2MxMi41MzYsMCwyMi43MTEtMTAuMTgsMjIuNzExLTIyLjcxNlYyNTAgIGMwLTEyMC40NzEtOTcuNTc4LTIxOC4wNTEtMjE4LjA1MS0yMTguMDUxYy0xMjAuNDcxLDAtMjE4LjA1MSw5Ny41OC0yMTguMDUxLDIxOC4wNTFWNDE4LjA4MXoiIGZpbGw9IiMwMTAxMDEiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg=="
+    />
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
-
 <router-outlet></router-outlet>

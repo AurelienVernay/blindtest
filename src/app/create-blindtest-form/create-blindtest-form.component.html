@@ -1,0 +1,35 @@
+<h1 mat-dialog-title>Créer un nouveau blindtest</h1>
+<form [formGroup]="blindtestForm" (ngSubmit)="createBlindtest()">
+    <mat-dialog-content>
+        <mat-form-field>
+            <input
+                matInput
+                type="text"
+                placeholder="Nom du blindtest"
+                formControlName="title"
+            />
+        </mat-form-field>
+        <br />
+        <mat-form-field>
+            <input
+                matInput
+                type="text"
+                placeholder="Auteur(s)"
+                formControlName="author"
+            />
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button
+            mat-raised-button
+            color="primary"
+            matTooltip="Valider"
+            [disabled]="!blindtestForm.valid"
+        >
+            <mat-icon>check_outline</mat-icon>Valider
+        </button>
+        <button mat-raised-button mat-dialog-close>
+            <mat-icon>close</mat-icon>Annuler
+        </button>
+    </mat-dialog-actions>
+</form>

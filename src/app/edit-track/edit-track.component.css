@@ -1,0 +1,16 @@
+::ng-deep .noUi-target {
+    margin-top: 3em;
+}
+
+::ng-deep .noUi-connect {
+    background-color: #673ab7;
+}
+::ng-deep .noUi-handle.noUi-handle-upper,
+::ng-deep .noUi-handle.noUi-handle-lower {
+    width: 17px;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+}

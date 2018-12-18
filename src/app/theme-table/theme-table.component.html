@@ -1,0 +1,102 @@
+<!-- <p>{{ theme | json }}</p> -->
+<form [formGroup]="themeForm" (ngSubmit)="onModifyTheme()">
+    <h1>
+        Thème n°
+        <mat-form-field [ngStyle]="{ width: '2em' }">
+            <input
+                matInput
+                type="number"
+                min="1"
+                max="99"
+                formControlName="order"
+            />
+        </mat-form-field>
+        :
+        <mat-form-field>
+            <input matInput type="text" formControlName="name" />
+        </mat-form-field>
+        <button
+            *ngIf="
+                themeForm.controls['order'].value !== theme.order ||
+                themeForm.controls['name'].value !== theme.name
+            "
+            mat-raised-button
+            color="primary"
+            matTooltip="Valider les changements"
+            [disabled]="!themeForm.valid"
+        >
+            <mat-icon>check</mat-icon>
+        </button>
+    </h1>
+</form>
+<form [formGroup]="trackForm">
+    <table mat-table [dataSource]="theme.tracks">
+        <ng-container matColumnDef="order">
+            <th mat-header-cell *matHeaderCellDef>N° ordre</th>
+            <td mat-cell *matCellDef="let track">{{ track.order }}</td>
+            <td mat-footer-cell *matFooterCellDef>
+                <mat-form-field>
+                    <input matInput type="number" formControlName="order" />
+                </mat-form-field>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="artists">
+            <th mat-header-cell *matHeaderCellDef>Artiste(s)</th>
+            <td mat-cell *matCellDef="let track">
+                <span *ngFor="let artist of track.artists">{{ artist }} </span>
+            </td>
+            <td mat-footer-cell *matFooterCellDef>
+                <mat-form-field>
+                    <input matInput type="text" formControlName="artists" />
+                </mat-form-field>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Titre</th>
+            <td mat-cell *matCellDef="let track">{{ track.title }}</td>
+            <td mat-footer-cell *matFooterCellDef>
+                <mat-form-field>
+                    <input matInput type="text" formControlName="title" />
+                </mat-form-field>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let track">
+                <button
+                    mat-mini-fab
+                    color="primary"
+                    matTooltip="Editer"
+                    (click)="onEditTrack(track)"
+                >
+                    <mat-icon aria-label="Supprimer">tune</mat-icon>
+                </button>
+                <button
+                    mat-mini-fab
+                    color="warn"
+                    matTooltip="Supprimer"
+                    (click)="onDeleteTrack(track)"
+                >
+                    <mat-icon aria-label="Supprimer">delete</mat-icon>
+                </button>
+            </td>
+            <td mat-footer-cell *matFooterCellDef>
+                <button
+                    mat-mini-fab
+                    color="primary"
+                    matTooltip="Ajouter une chanson"
+                    [disabled]="!trackForm.valid"
+                    (click)="onAddTrack()"
+                >
+                    <mat-icon aria-label="Ajouter une chanson"
+                        >plus_one</mat-icon
+                    >
+                </button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+        <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
+    </table>
+</form>
