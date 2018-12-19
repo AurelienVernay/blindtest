@@ -1,51 +1,64 @@
-<h1>Gloubi-boulga</h1>
-<form [formGroup]="gloubiForm">
-    <table mat-table [dataSource]="gloubi.tracks">
-        <ng-container matColumnDef="order">
-            <th mat-header-cell *matHeaderCellDef>N° ordre</th>
-            <td mat-cell *matCellDef="let track">{{ track.order }}</td>
-            <td mat-footer-cell *matFooterCellDef>
-                <mat-form-field>
-                    <input matInput type="number" formControlName="order" />
-                </mat-form-field>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="title">
-            <th mat-header-cell *matHeaderCellDef>Titre de l'extrait</th>
-            <td mat-cell *matCellDef="let track">{{ track.title }}</td>
-            <td mat-footer-cell *matFooterCellDef>
-                <mat-form-field>
-                    <input matInput type="text" formControlName="title" />
-                </mat-form-field>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let track">
-                <button
-                    mat-mini-fab
-                    color="primary"
-                    matTooltip="Supprimer"
-                    (click)="deleteTrack(track)"
-                >
-                    <mat-icon aria-label="Voir détails">delete</mat-icon>
-                </button>
-            </td>
-            <td mat-footer-cell *matFooterCellDef>
-                <button
-                    mat-mini-fab
-                    color="primary"
-                    matTooltip="Ajouter une piste"
-                    (click)="addNewTrack()"
-                    [disabled]="!gloubiForm.valid"
-                >
-                    <mat-icon>plus_one</mat-icon>
-                </button>
-            </td>
-        </ng-container>
+<mat-card class="card">
+    <mat-card-header>
+        <mat-toolbar color="primary">
+            <span>Gloubi-boulga</span>
+            <span class="example-fill-remaining-space"></span>
+            <button mat-raised-button color="warn">
+                <mat-icon>delete</mat-icon>Supprimer
+            </button>
+        </mat-toolbar>
+    </mat-card-header>
+    <form [formGroup]="gloubiForm">
+        <table mat-table [dataSource]="gloubi.tracks">
+            <ng-container matColumnDef="order">
+                <th mat-header-cell *matHeaderCellDef>N° ordre</th>
+                <td mat-cell *matCellDef="let track">{{ track.order }}</td>
+                <td mat-footer-cell *matFooterCellDef>
+                    <mat-form-field>
+                        <input matInput type="number" formControlName="order" />
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Titre de l'extrait</th>
+                <td mat-cell *matCellDef="let track">{{ track.title }}</td>
+                <td mat-footer-cell *matFooterCellDef>
+                    <mat-form-field>
+                        <input matInput type="text" formControlName="title" />
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let track">
+                    <button
+                        mat-mini-fab
+                        color="warn"
+                        matTooltip="Supprimer"
+                        (click)="deleteTrack(track)"
+                    >
+                        <mat-icon aria-label="Supprimer">delete</mat-icon>
+                    </button>
+                </td>
+                <td mat-footer-cell *matFooterCellDef>
+                    <button
+                        mat-mini-fab
+                        color="primary"
+                        matTooltip="Ajouter une piste"
+                        (click)="addNewTrack()"
+                        [disabled]="!gloubiForm.valid"
+                    >
+                        <mat-icon>plus_one</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-        <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
-        <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
-    </table>
-</form>
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+            <tr
+                mat-row
+                *matRowDef="let myRowData; columns: columnsToDisplay"
+            ></tr>
+            <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
+        </table>
+    </form>
+</mat-card>

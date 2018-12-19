@@ -14,3 +14,16 @@
     display: flex;
     justify-content: space-between;
 }
+
+.duration-picker {
+    flex-grow: 35;
+}
+.preview-play-btn {
+    position: relative;
+    bottom: 1em;
+    flex-grow: 1;
+    align-self: flex-end;
+}
+.preview-duration {
+    align-self: center;
+}

@@ -1,7 +1,9 @@
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Theme } from '../models/theme.model';
 import { Track } from '../models/track.model';
+import { ConfirmDeleteItemComponent } from '../confirm-delete-item/confirm-delete-item.component';
 
 @Component({
     selector: 'app-gloubi-table',
@@ -31,16 +33,24 @@ export class GloubiTableComponent implements OnInit {
     @Output() updateGloubi = new EventEmitter<Theme>();
     public columnsToDisplay = ['order', 'title', 'actions'];
     public gloubiForm: FormGroup;
-    constructor(private fb: FormBuilder) {}
+    public dialogRef: MatDialogRef<ConfirmDeleteItemComponent>;
+    constructor(private fb: FormBuilder, private dialog: MatDialog) {}
 
     ngOnInit() {}
 
     public deleteTrack(track: Track) {
-        this.updateGloubi.emit({
-            ...this.gloubi,
-            tracks: this.gloubi.tracks.filter(
-                find => find.order !== track.order
-            ),
+        this.dialogRef = this.dialog.open(ConfirmDeleteItemComponent, {
+            data: track.title,
+        });
+        this.dialogRef.afterClosed().subscribe(confirm => {
+            if (confirm) {
+                this.updateGloubi.emit({
+                    ...this.gloubi,
+                    tracks: this.gloubi.tracks.filter(
+                        find => find.order !== track.order
+                    ),
+                });
+            }
         });
     }
 

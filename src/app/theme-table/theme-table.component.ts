@@ -4,7 +4,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Theme } from '../models/theme.model';
 import { Track } from '../models/track.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ConfirmDeleteTrackComponent } from '../confirm-delete-track/confirm-delete-track.component';
+import { ConfirmDeleteItemComponent } from '../confirm-delete-item/confirm-delete-item.component';
 
 @Component({
     selector: 'app-theme-table',
@@ -12,13 +12,23 @@ import { ConfirmDeleteTrackComponent } from '../confirm-delete-track/confirm-del
     styleUrls: ['./theme-table.component.css'],
 })
 export class ThemeTableComponent implements OnInit {
+    private dialogEdit: MatDialogRef<EditTrackComponent>;
+    private dialogConfirmDelete: MatDialogRef<ConfirmDeleteItemComponent>;
     @Input() public theme: Theme;
     public themeForm: FormGroup;
     public trackForm: FormGroup;
-    public columnsToDisplay = ['order', 'artists', 'title', 'actions'];
+    public columnsToDisplay = [
+        'order',
+        'artists',
+        'title',
+        'duration',
+        'actions',
+    ];
     @Output() updateTheme = new EventEmitter<Theme>();
-    private dialogEdit: MatDialogRef<EditTrackComponent>;
-    private dialogConfirmDelete: MatDialogRef<ConfirmDeleteTrackComponent>;
+
+    @Output() deleteTheme = new EventEmitter<Theme>();
+
+    @Output() test = new EventEmitter<Theme>();
     constructor(private fb: FormBuilder, private dialog: MatDialog) {}
 
     ngOnInit() {
@@ -41,17 +51,26 @@ export class ThemeTableComponent implements OnInit {
 
     public onDeleteTrack(track: Track) {
         this.dialogConfirmDelete = this.dialog.open(
-            ConfirmDeleteTrackComponent
+            ConfirmDeleteItemComponent,
+            {
+                data: track.title,
+            }
         );
-        // filter tracks
-        const tracks: Track[] = this.theme.tracks.filter(
-            find => find.order !== track.order
-        );
-        // reorder tracks
-        tracks.forEach((unorderedTrack, i) => (unorderedTrack.order = i + 1));
-        this.updateTheme.emit({
-            ...this.theme,
-            tracks: [...tracks],
+        this.dialogConfirmDelete.afterClosed().subscribe(confirm => {
+            if (confirm) {
+                // filter tracks
+                const tracks: Track[] = this.theme.tracks.filter(
+                    find => find.order !== track.order
+                );
+                // reorder tracks
+                tracks.forEach(
+                    (unorderedTrack, i) => (unorderedTrack.order = i + 1)
+                );
+                this.updateTheme.emit({
+                    ...this.theme,
+                    tracks: [...tracks],
+                });
+            }
         });
     }
     public onAddTrack() {
@@ -78,6 +97,45 @@ export class ThemeTableComponent implements OnInit {
     public onEditTrack(track: Track) {
         this.dialogEdit = this.dialog.open(EditTrackComponent, {
             data: { track: track, isGloubi: false },
+        });
+        this.dialogEdit.afterClosed().subscribe(result => {
+            if (result) {
+                this.updateTheme.emit({
+                    ...this.theme,
+                    tracks: [
+                        ...this.theme.tracks.filter(
+                            find => find.order !== track.order
+                        ),
+                        {
+                            ...result,
+                            artists: result.artists.split(' '),
+                        },
+                    ],
+                });
+            }
+        });
+    }
+    public getThemeDuration() {
+        let sum = 0;
+        this.theme.tracks.forEach(
+            track =>
+                (sum += track.durationRange
+                    ? track.durationRange[1] - track.durationRange[0]
+                    : 0)
+        );
+        return sum;
+    }
+
+    public onDeleteTheme() {
+        this.dialogConfirmDelete = this.dialog.open(
+            ConfirmDeleteItemComponent,
+            { data: this.theme.name }
+        );
+        this.dialogConfirmDelete.afterClosed().subscribe(confirm => {
+            if (confirm) {
+                this.deleteTheme.emit({ order: 1, name: 'test', tracks: [] });
+                this.test.emit(this.theme);
+            }
         });
     }
 }

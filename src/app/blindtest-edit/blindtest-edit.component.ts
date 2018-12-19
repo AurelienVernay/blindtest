@@ -91,6 +91,15 @@ export class BlindtestEditComponent implements OnInit {
             }
         });
     }
+
+    public onDeleteTheme(theme: Theme) {
+        this.$blindtest = this.btService.update({
+            ...this.blindtest,
+            themes: [...this.themes.filter(find => find.order !== theme.order)],
+        });
+    }
+    public onAddGloubi() {}
+
     public onUpdateBlindtest() {
         this.$blindtest = this.btService.update({
             ...this.blindtest,

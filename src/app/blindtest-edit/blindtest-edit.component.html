@@ -22,23 +22,28 @@
         </button>
     </h1>
 </form>
-<app-theme-table
-    *ngFor="let theme of themes"
-    [theme]="theme"
-    (updateTheme)="onUpdateTheme($event)"
->
-</app-theme-table>
-<button
-    mat-raised-button
-    color="primary"
-    (click)="onAddTheme()"
-    matTooltip="Ajouter un thème"
->
-    <mat-icon>plus_one</mat-icon>
-</button>
-<app-gloubi-table
-    *ngIf="gloubi"
-    [gloubi]="gloubi"
-    (updateGloubi)="onUpdateGloubi($event)"
-></app-gloubi-table>
-<br />
+<div class="container">
+    <button mat-raised-button color="primary" (click)="onAddTheme()">
+        <mat-icon>plus_one</mat-icon>Ajouter un thème
+    </button>
+    <button
+        *ngIf="!blindtest?.gloubi"
+        mat-raised-button
+        color="primary"
+        (click)="onAddGloubi()"
+    >
+        <mat-icon>plus_one</mat-icon>Ajouter un Gloubi-boulga
+    </button>
+    <app-theme-table
+        *ngFor="let theme of themes"
+        [theme]="theme"
+        (deleteTheme)="onDeleteTheme($event)"
+        (updateTheme)="onUpdateTheme($event)"
+    >
+    </app-theme-table>
+    <app-gloubi-table
+        *ngIf="gloubi"
+        [gloubi]="gloubi"
+        (updateGloubi)="onUpdateGloubi($event)"
+    ></app-gloubi-table>
+</div>

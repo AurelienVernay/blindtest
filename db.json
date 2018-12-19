@@ -7,22 +7,7 @@
       "themes": [
         {
           "name": "Hello world",
-          "tracks": [
-            {
-              "order": 1,
-              "artists": [
-                "vv"
-              ],
-              "title": "zzz"
-            },
-            {
-              "order": 2,
-              "artists": [
-                "zzz"
-              ],
-              "title": "sss"
-            }
-          ],
+          "tracks": [],
           "order": 2
         },
         {
@@ -35,20 +20,7 @@
       "gloubi": {
         "id": 1,
         "name": "gloubi",
-        "tracks": [
-          {
-            "title": "aaa",
-            "order": 2
-          },
-          {
-            "title": "Test",
-            "order": 3
-          },
-          {
-            "title": "encore un !",
-            "order": 4
-          }
-        ]
+        "tracks": []
       }
     },
     {

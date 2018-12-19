@@ -4,4 +4,5 @@ export interface Track {
     artists?: string[];
     title: string;
     durationRange?: number[];
+    dataURI?: string;
 }

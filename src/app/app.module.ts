@@ -19,10 +19,13 @@ import { ThemeTableComponent } from './theme-table/theme-table.component';
 import { GloubiTableComponent } from './gloubi-table/gloubi-table.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { CreateBlindtestFormComponent } from './create-blindtest-form/create-blindtest-form.component';
 import { AddThemeFormComponent } from './add-theme-form/add-theme-form.component';
 import { EditTrackComponent } from './edit-track/edit-track.component';
-import { ConfirmDeleteTrackComponent } from './confirm-delete-track/confirm-delete-track.component';
+import { ConfirmDeleteItemComponent } from './confirm-delete-item/confirm-delete-item.component';
 import { NouisliderModule } from 'ng2-nouislider';
 import { TimeFormatPipe } from './pipes/time-format.pipe';
 
@@ -34,6 +37,9 @@ const matModules = [
     MatTooltipModule,
     MatInputModule,
     MatDialogModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
+    MatToolbarModule,
 ];
 
 @NgModule({
@@ -46,14 +52,14 @@ const matModules = [
         CreateBlindtestFormComponent,
         AddThemeFormComponent,
         EditTrackComponent,
-        ConfirmDeleteTrackComponent,
+        ConfirmDeleteItemComponent,
         TimeFormatPipe,
     ],
     entryComponents: [
         CreateBlindtestFormComponent,
         AddThemeFormComponent,
         EditTrackComponent,
-        ConfirmDeleteTrackComponent,
+        ConfirmDeleteItemComponent,
     ],
     imports: [
         BrowserModule,

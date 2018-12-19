@@ -18,7 +18,7 @@
             color="primary"
             (click)="onFileUploadClicked()"
         >
-            Importer un fichier
+            <mat-icon>audiotrack</mat-icon> Importer un fichier
         </button>
         <input
             id="fileInput"
@@ -27,28 +27,54 @@
             (change)="onFileUploaded($event)"
             style="display:none;"
         />
-        <i *ngIf="fileLoaded">{{ file.name }}</i>
-        <i *ngIf="previewDuration">{{ previewDuration | timeFormat }}</i>
+        <mat-spinner *ngIf="loading" [diameter]="30"></mat-spinner>
+        <i
+            *ngIf="!!trackForm.controls.dataURI?.value && previewDuration"
+            class="preview-duration"
+            >Durée de la piste : {{ previewDuration | timeFormat }}</i
+        >
     </div>
-    <nouislider
-        *ngIf="fileLoaded"
-        [connect]="true"
-        [min]="0"
-        [max]="previewDuration"
-        [tooltips]="[formatter(), formatter()]"
-        [step]="1"
-        [formControl]="trackForm.controls['durationRange']"
-    ></nouislider>
+    <div class="container">
+        <nouislider
+            [ngClass]="'duration-picker'"
+            [ngStyle]="{ padding: '0em 1.7em' }"
+            *ngIf="loaded"
+            [connect]="true"
+            [min]="0"
+            [max]="previewDuration"
+            [tooltips]="formatters"
+            [step]="1"
+            [formControl]="trackForm.controls['durationRange']"
+        ></nouislider>
+        <span *ngIf="loaded" class="preview-play-btn">
+            <button
+                mat-mini-fab
+                color="primary"
+                matTooltip="Aperçu de l'extrait"
+                (click)="togglePlay()"
+            >
+                <mat-icon *ngIf="!playing; else pause">play_arrow</mat-icon>
+                <ng-template #pause> <mat-icon>pause</mat-icon> </ng-template>
+            </button>
+        </span>
+    </div>
+    <i *ngIf="loaded"
+        >Durée selectionnée : {{ durationSelected | timeFormat }}</i
+    >
     <mat-dialog-actions
         ><button
-            *ngIf="fileLoaded"
-            mat-mini-fab
+            mat-raised-button
             color="primary"
-            matTooltip="Aperçu de l'extrait"
-            (click)="togglePlay()"
+            [mat-dialog-close]="trackForm.value"
+            [disabled]="
+                !trackForm.valid || !!trackForm.controls.durationRange?.disabled
+            "
         >
-            <mat-icon *ngIf="!playing; else pause">play_arrow</mat-icon>
-            <ng-template #pause> <mat-icon>pause</mat-icon> </ng-template>
+            <mat-icon>save</mat-icon>Enregistrer
+        </button>
+        <button mat-raised-button color="warn" mat-dialog-close>
+            <mat-icon>close</mat-icon>
+            Annuler
         </button></mat-dialog-actions
     >
 </form>

@@ -1,37 +1,61 @@
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Track } from './../models/track.model';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Howl } from 'howler';
-import { NouiFormatter } from 'ng2-nouislider';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-edit-track',
     templateUrl: './edit-track.component.html',
     styleUrls: ['./edit-track.component.css'],
 })
-export class EditTrackComponent implements OnInit {
+export class EditTrackComponent implements OnInit, OnDestroy {
     public trackForm: FormGroup;
-
-    private dataURI: any;
     private idHowl: number;
     private howler: Howl;
     private _previewDuration = 0;
+    private formatter = {
+        from: (string: string): number => {
+            return (
+                (string.indexOf('m') > -1
+                    ? parseInt(string.slice(0, string.indexOf('m')), 10) * 60
+                    : 0) +
+                parseInt(
+                    string.slice(string.indexOf('m') + 1, string.length - 1),
+                    10
+                )
+            );
+        },
+        to: (number: number): string => {
+            const myDuration = moment.duration(number, 'second');
+            if (myDuration.minutes() >= 1) {
+                let value = `${myDuration.minutes()}m`;
+                if (myDuration.seconds() > 0) {
+                    value = value.concat(` ${myDuration.seconds()}s`);
+                }
+                return value;
+            } else {
+                return `${myDuration.seconds()}s`;
+            }
+        },
+    };
+    private durationSubscription: Subscription;
+    private dataURISubscription: Subscription;
+    private _playing = false;
+    public formatters = [this.formatter, this.formatter];
     public get previewDuration() {
         return this._previewDuration;
     }
     public set previewDuration(duration: number) {
         this._previewDuration = Math.round(duration);
-        this.trackForm.setControl(
-            'durationRange',
-            this.fb.control([0, Math.round(duration)], Validators.required)
-        );
     }
+    public durationSelected = 0;
     public get track() {
         return this.data.track;
     }
-    private _playing = false;
+
     get playing() {
         return this._playing;
     }
@@ -44,12 +68,12 @@ export class EditTrackComponent implements OnInit {
             this.howler.fade(0, 1, 2000, this.idHowl);
         } else {
             this.trackForm.controls['durationRange'].enable();
-            this.howler.fade(1, 0, 2000, this.idHowl);
-            this.howler.pause('preview');
+            this.howler.stop(this.idHowl);
         }
     }
     public file: File = null;
-    public fileLoaded = false;
+    public loading = false;
+    public loaded = false;
     constructor(
         @Inject(MAT_DIALOG_DATA)
         private data: { track: Track; isGloubi: boolean },
@@ -60,9 +84,11 @@ export class EditTrackComponent implements OnInit {
         this.trackForm = this.fb.group({
             title: this.fb.control(this.track.title, Validators.required),
             durationRange: this.fb.control(
-                this.track.durationRange ? this.track.durationRange : [0, 100],
+                this.track.durationRange,
                 Validators.required
             ),
+            dataURI: this.fb.control(this.track.dataURI, Validators.required),
+            order: this.fb.control(this.track.order),
         });
         if (!this.data.isGloubi) {
             this.trackForm.addControl(
@@ -73,23 +99,59 @@ export class EditTrackComponent implements OnInit {
                 )
             );
         }
+        this.durationSubscription = this.trackForm.valueChanges.subscribe(
+            values => {
+                if (values.durationRange) {
+                    this.durationSelected =
+                        values.durationRange[1] - values.durationRange[0];
+                }
+            }
+        );
+        this.dataURISubscription = this.trackForm.controls[
+            'dataURI'
+        ].valueChanges.subscribe(() => {
+            this.loading = true;
+            this.computeSound();
+        });
+        if (this.track.dataURI) {
+            this.loading = true;
+            this.computeSound();
+        }
+        if (this.track.durationRange) {
+            this.durationSelected =
+                this.track.durationRange[1] - this.track.durationRange[0];
+        }
+    }
+
+    ngOnDestroy(): void {
+        if (this.durationSubscription) {
+            this.durationSubscription.unsubscribe();
+        }
+        if (this.dataURISubscription) {
+            this.dataURISubscription.unsubscribe();
+        }
+        if (this.howler) {
+            this.howler.unload();
+        }
     }
 
     public onFileUploadClicked() {
         document.getElementById('fileInput').click();
-        this.fileLoaded = false;
+        this.loaded = false;
     }
 
     public onFileUploaded(event) {
-        const files: FileList = event.srcElement.files;
-        if (files.item(0)) {
-            this.file = files.item(0);
+        this.file = event.srcElement.files.item(0);
+        if (this.file) {
+            if (this.howler) {
+                this.howler.unload();
+            }
+            this.loading = true;
             const reader = new FileReader();
             reader.addEventListener(
                 'load',
                 () => {
-                    this.dataURI = reader.result;
-                    this.computeSound();
+                    this.trackForm.controls['dataURI'].setValue(reader.result);
                 },
                 false
             );
@@ -101,22 +163,29 @@ export class EditTrackComponent implements OnInit {
     }
 
     private computeSound() {
+        this.loading = true;
         this.howler = new Howl({
-            src: [this.dataURI],
+            src: [this.trackForm.controls['dataURI'].value],
             onload: () => {
                 this.previewDuration = this.howler.duration();
-                this.fileLoaded = true;
+                this.loading = false;
+                this.loaded = true;
+                if (!this.track.durationRange) {
+                    this.trackForm.setControl(
+                        'durationRange',
+                        this.fb.control(
+                            [0, this.howler.duration()],
+                            Validators.required
+                        )
+                    );
+                }
             },
         });
-        this.trackForm.setControl(
-            'durationRange',
-            this.fb.control([0, this.howler.duration()], Validators.required)
-        );
     }
 
     private generatePreview() {
         this.howler = new Howl({
-            src: [this.dataURI],
+            src: [this.trackForm.controls['dataURI'].value],
             sprite: {
                 preview: [
                     this.trackForm.controls['durationRange'].value[0] * 1000,
@@ -130,32 +199,5 @@ export class EditTrackComponent implements OnInit {
                 this.playing = false;
             },
         });
-    }
-    public formatter(): NouiFormatter {
-        return {
-            from: (string: string): number => {
-                return (
-                    (string.indexOf('m') > -1
-                        ? parseInt(string.slice(0, string.indexOf('m')), 10) *
-                          60
-                        : 0) +
-                    parseInt(
-                        string.slice(
-                            string.indexOf('m') + 1,
-                            string.length - 1
-                        ),
-                        10
-                    )
-                );
-            },
-            to: (number: number): string => {
-                const myDuration = moment.duration(number, 'second');
-                if (myDuration.minutes() >= 1) {
-                    return `${myDuration.minutes()}m ${myDuration.seconds()}s`;
-                } else {
-                    return `${myDuration.seconds()}s`;
-                }
-            },
-        };
     }
 }
