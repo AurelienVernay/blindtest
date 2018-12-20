@@ -22,6 +22,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatChipsModule } from '@angular/material/chips';
 import { CreateBlindtestFormComponent } from './create-blindtest-form/create-blindtest-form.component';
 import { AddThemeFormComponent } from './add-theme-form/add-theme-form.component';
 import { EditTrackComponent } from './edit-track/edit-track.component';
@@ -40,6 +41,7 @@ const matModules = [
     MatProgressSpinnerModule,
     MatCardModule,
     MatToolbarModule,
+    MatChipsModule,
 ];
 
 @NgModule({

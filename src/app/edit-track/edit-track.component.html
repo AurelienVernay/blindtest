@@ -4,12 +4,31 @@
         <mat-form-field>
             <input matInput type="text" formControlName="title" />
         </mat-form-field>
-        <i *ngIf="!data.isGloubi"
-            >- par
+        <span *ngIf="!data.isGloubi"
+            ><i>par</i>
             <mat-form-field>
-                <input matInput type="text" formControlName="artists" />
+                <mat-chip-list #chipList>
+                    <mat-chip
+                        *ngFor="
+                            let artist of trackForm.controls['artists'].value
+                        "
+                        [selectable]="true"
+                        [removable]="true"
+                        (removed)="removeArtistFromTrack(artist)"
+                    >
+                        {{ artist }}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <input
+                        placeholder="Artistes..."
+                        [matChipInputFor]="chipList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matChipInputAddOnBlur]="true"
+                        (matChipInputTokenEnd)="addNewArtistToTrack($event)"
+                    />
+                </mat-chip-list>
             </mat-form-field>
-        </i>
+        </span>
     </h1>
     <mat-dialog-content> </mat-dialog-content>
     <div class="container">

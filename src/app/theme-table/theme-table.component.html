@@ -1,7 +1,7 @@
 <mat-card class="card">
     <mat-card-header>
-        <form [formGroup]="themeForm" (ngSubmit)="onModifyTheme()">
-            <mat-toolbar color="primary">
+        <mat-toolbar color="primary">
+            <form [formGroup]="themeForm" (ngSubmit)="onModifyTheme()">
                 <span>
                     Thème n°
                     <mat-form-field [ngStyle]="{ width: '2em' }">
@@ -30,16 +30,16 @@
                         <mat-icon>check</mat-icon>
                     </button>
                 </span>
-                <span class="example-fill-remaining-space"></span>
-                <button
-                    mat-raised-button
-                    color="warn"
-                    (click)="onDeleteTheme()"
-                >
-                    <mat-icon>delete</mat-icon>Supprimer
-                </button>
-            </mat-toolbar>
-        </form>
+            </form>
+            <span class="example-fill-remaining-space"></span>
+            <button
+                mat-raised-button
+                color="warn"
+                (click)="onDeleteThemeClicked()"
+            >
+                <mat-icon>delete</mat-icon>Supprimer
+            </button>
+        </mat-toolbar>
     </mat-card-header>
     <form [formGroup]="trackForm">
         <table mat-table [dataSource]="theme.tracks">
@@ -55,14 +55,32 @@
             <ng-container matColumnDef="artists">
                 <th mat-header-cell *matHeaderCellDef>Artiste(s)</th>
                 <td mat-cell *matCellDef="let track">
-                    <span *ngFor="let artist of track.artists"
-                        >{{ artist }}
+                    <span *ngFor="let artist of track.artists; last as last"
+                        >{{ artist }} <span *ngIf="!last"> - </span>
                     </span>
                 </td>
                 <td mat-footer-cell *matFooterCellDef>
-                    <mat-form-field>
-                        <input matInput type="text" formControlName="artists" />
-                    </mat-form-field>
+                    <mat-chip-list #chipList>
+                        <mat-chip
+                            *ngFor="
+                                let artist of trackForm.controls['artists']
+                                    .value
+                            "
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="removeArtistFromTrack(artist)"
+                        >
+                            {{ artist }}
+                            <mat-icon matChipRemove>cancel</mat-icon>
+                        </mat-chip>
+                        <input
+                            placeholder="Artistes..."
+                            [matChipInputFor]="chipList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputAddOnBlur]="true"
+                            (matChipInputTokenEnd)="addNewArtistToTrack($event)"
+                        />
+                    </mat-chip-list>
                 </td>
             </ng-container>
             <ng-container matColumnDef="title">
@@ -111,7 +129,7 @@
                         class="warning"
                         color="warn"
                         *ngIf="!track.dataURI"
-                        matTooltip="l'extrait audio n'est pas configuré. Editez l'extrait dans le menu Editer"
+                        matTooltip="L'extrait audio n'est pas configuré. Editez l'extrait dans le menu Editer"
                         >warning</mat-icon
                     >
                 </td>

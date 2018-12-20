@@ -5,7 +5,7 @@ import { Blindtest } from './../models/blindtest.model';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.component';
 
@@ -16,12 +16,16 @@ import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.componen
 })
 export class BlindtestEditComponent implements OnInit {
     private _$blindtest: Observable<Blindtest>;
+    private subscription: Subscription;
     public get $blindtest() {
         return this._$blindtest;
     }
     public set $blindtest(observable: Observable<Blindtest>) {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
         this._$blindtest = observable;
-        this._$blindtest.subscribe(blindtest => {
+        this.subscription = this._$blindtest.subscribe(blindtest => {
             this.blindtest = blindtest;
             this.themes = blindtest.themes;
             this.gloubi = blindtest.gloubi;
@@ -95,10 +99,17 @@ export class BlindtestEditComponent implements OnInit {
     public onDeleteTheme(theme: Theme) {
         this.$blindtest = this.btService.update({
             ...this.blindtest,
-            themes: [...this.themes.filter(find => find.order !== theme.order)],
+            themes: [...this.themes.filter(find => find.id !== theme.id)],
         });
     }
-    public onAddGloubi() {}
+    public onAddGloubi() {
+        this.$blindtest = this.btService.update({
+            ...this.blindtest,
+            gloubi: {
+                tracks: [],
+            },
+        });
+    }
 
     public onUpdateBlindtest() {
         this.$blindtest = this.btService.update({
@@ -111,5 +122,12 @@ export class BlindtestEditComponent implements OnInit {
             ...this.blindtest,
             gloubi: { ...gloubi },
         });
+    }
+    public onDeleteGloubi() {
+        const blindtest: Blindtest = {
+            ...this.blindtest,
+        };
+        delete blindtest.gloubi;
+        this.$blindtest = this.btService.update(blindtest);
     }
 }

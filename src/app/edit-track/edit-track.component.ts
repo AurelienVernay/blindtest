@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Howl } from 'howler';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 @Component({
     selector: 'app-edit-track',
@@ -45,6 +46,9 @@ export class EditTrackComponent implements OnInit, OnDestroy {
     private dataURISubscription: Subscription;
     private _playing = false;
     public formatters = [this.formatter, this.formatter];
+
+    readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+
     public get previewDuration() {
         return this._previewDuration;
     }
@@ -93,10 +97,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
         if (!this.data.isGloubi) {
             this.trackForm.addControl(
                 'artists',
-                this.fb.control(
-                    this.track.artists.join(','),
-                    Validators.required
-                )
+                this.fb.control(this.track.artists, Validators.required)
             );
         }
         this.durationSubscription = this.trackForm.valueChanges.subscribe(
@@ -138,6 +139,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
     public onFileUploadClicked() {
         document.getElementById('fileInput').click();
         this.loaded = false;
+        this.previewDuration = null;
     }
 
     public onFileUploaded(event) {
@@ -199,5 +201,22 @@ export class EditTrackComponent implements OnInit, OnDestroy {
                 this.playing = false;
             },
         });
+    }
+
+    public addNewArtistToTrack(event) {
+        if ((event.input.value || '').trim()) {
+            this.trackForm.controls['artists'].setValue([
+                ...this.trackForm.controls['artists'].value,
+                event.input.value,
+            ]);
+            event.input.value = null;
+        }
+    }
+    public removeArtistFromTrack(artist: string) {
+        this.trackForm.controls['artists'].setValue([
+            ...this.trackForm.controls['artists'].value.filter(
+                find => find !== artist
+            ),
+        ]);
     }
 }

@@ -31,18 +31,22 @@ export class GloubiTableComponent implements OnInit {
         });
     }
     @Output() updateGloubi = new EventEmitter<Theme>();
+    @Output() deleteGloubi = new EventEmitter();
     public columnsToDisplay = ['order', 'title', 'actions'];
     public gloubiForm: FormGroup;
-    public dialogRef: MatDialogRef<ConfirmDeleteItemComponent>;
+    public dialogCOnfirmDelete: MatDialogRef<ConfirmDeleteItemComponent>;
     constructor(private fb: FormBuilder, private dialog: MatDialog) {}
 
     ngOnInit() {}
 
     public deleteTrack(track: Track) {
-        this.dialogRef = this.dialog.open(ConfirmDeleteItemComponent, {
-            data: track.title,
-        });
-        this.dialogRef.afterClosed().subscribe(confirm => {
+        this.dialogCOnfirmDelete = this.dialog.open(
+            ConfirmDeleteItemComponent,
+            {
+                data: track.title,
+            }
+        );
+        this.dialogCOnfirmDelete.afterClosed().subscribe(confirm => {
             if (confirm) {
                 this.updateGloubi.emit({
                     ...this.gloubi,
@@ -61,5 +65,17 @@ export class GloubiTableComponent implements OnInit {
             tracks: [...this.gloubi.tracks, this.gloubiForm.value],
         });
         this.gloubiForm.controls['order'].disable();
+    }
+
+    public onDeleteGloubi() {
+        this.dialogCOnfirmDelete = this.dialog.open(
+            ConfirmDeleteItemComponent,
+            { data: 'Gloubi-boulga' }
+        );
+        this.dialogCOnfirmDelete.afterClosed().subscribe(confirm => {
+            if (confirm) {
+                this.deleteGloubi.emit();
+            }
+        });
     }
 }

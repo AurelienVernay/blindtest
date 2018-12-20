@@ -37,7 +37,7 @@
     <app-theme-table
         *ngFor="let theme of themes"
         [theme]="theme"
-        (deleteTheme)="onDeleteTheme($event)"
+        (deleteTheme)="onDeleteTheme(theme)"
         (updateTheme)="onUpdateTheme($event)"
     >
     </app-theme-table>
@@ -45,5 +45,6 @@
         *ngIf="gloubi"
         [gloubi]="gloubi"
         (updateGloubi)="onUpdateGloubi($event)"
+        (deleteGloubi)="onDeleteGloubi()"
     ></app-gloubi-table>
 </div>

@@ -5,6 +5,7 @@ import { Theme } from '../models/theme.model';
 import { Track } from '../models/track.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ConfirmDeleteItemComponent } from '../confirm-delete-item/confirm-delete-item.component';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 @Component({
     selector: 'app-theme-table',
@@ -14,6 +15,7 @@ import { ConfirmDeleteItemComponent } from '../confirm-delete-item/confirm-delet
 export class ThemeTableComponent implements OnInit {
     private dialogEdit: MatDialogRef<EditTrackComponent>;
     private dialogConfirmDelete: MatDialogRef<ConfirmDeleteItemComponent>;
+    readonly separatorKeysCodes: number[] = [ENTER, COMMA];
     @Input() public theme: Theme;
     public themeForm: FormGroup;
     public trackForm: FormGroup;
@@ -24,11 +26,11 @@ export class ThemeTableComponent implements OnInit {
         'duration',
         'actions',
     ];
+
     @Output() updateTheme = new EventEmitter<Theme>();
 
-    @Output() deleteTheme = new EventEmitter<Theme>();
+    @Output() deleteTheme = new EventEmitter();
 
-    @Output() test = new EventEmitter<Theme>();
     constructor(private fb: FormBuilder, private dialog: MatDialog) {}
 
     ngOnInit() {
@@ -44,7 +46,7 @@ export class ThemeTableComponent implements OnInit {
                 },
                 Validators.required
             ),
-            artists: this.fb.control('', Validators.required),
+            artists: this.fb.control([], Validators.required),
             title: this.fb.control('', Validators.required),
         });
     }
@@ -81,9 +83,6 @@ export class ThemeTableComponent implements OnInit {
                 ...this.theme.tracks,
                 {
                     ...this.trackForm.value,
-                    artists: this.trackForm.controls['artists'].value.split(
-                        ' '
-                    ),
                 },
             ],
         });
@@ -108,7 +107,6 @@ export class ThemeTableComponent implements OnInit {
                         ),
                         {
                             ...result,
-                            artists: result.artists.split(' '),
                         },
                     ],
                 });
@@ -126,16 +124,32 @@ export class ThemeTableComponent implements OnInit {
         return sum;
     }
 
-    public onDeleteTheme() {
+    public onDeleteThemeClicked() {
         this.dialogConfirmDelete = this.dialog.open(
             ConfirmDeleteItemComponent,
             { data: this.theme.name }
         );
         this.dialogConfirmDelete.afterClosed().subscribe(confirm => {
             if (confirm) {
-                this.deleteTheme.emit({ order: 1, name: 'test', tracks: [] });
-                this.test.emit(this.theme);
+                this.deleteTheme.emit();
             }
         });
+    }
+
+    public addNewArtistToTrack(event) {
+        if ((event.input.value || '').trim()) {
+            this.trackForm.controls['artists'].setValue([
+                ...this.trackForm.controls['artists'].value,
+                event.input.value,
+            ]);
+            event.input.value = null;
+        }
+    }
+    public removeArtistFromTrack(artist: string) {
+        this.trackForm.controls['artists'].setValue([
+            ...this.trackForm.controls['artists'].value.filter(
+                find => find !== artist
+            ),
+        ]);
     }
 }
