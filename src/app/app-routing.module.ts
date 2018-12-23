@@ -1,3 +1,4 @@
+import { BlindtestPlayerComponent } from './blindtest-player/blindtest-player.component';
 import { BlindtestEditComponent } from './blindtest-edit/blindtest-edit.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -7,6 +8,10 @@ const routes: Routes = [
     {
         path: 'blindtests',
         component: BlindtestsListComponent,
+    },
+    {
+        path: 'blindtest/:id/play',
+        component: BlindtestPlayerComponent,
     },
     {
         path: 'blindtest/:id',

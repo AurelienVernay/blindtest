@@ -1,0 +1,19 @@
+.modal-loading {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+}
+
+.selected {
+    background: rgba(103, 58, 183, 0.8);
+}
+.selected .mat-cell {
+    color: #fff;
+    font-weight: bolder;
+}

@@ -7,4 +7,11 @@ export class Theme {
         public id?: number,
         public order?: number
     ) {}
+
+    public static isValid(theme: Theme): boolean {
+        return (
+            theme.tracks.length &&
+            theme.tracks.every(track => Track.isValid(track))
+        );
+    }
 }

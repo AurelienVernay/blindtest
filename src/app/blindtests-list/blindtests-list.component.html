@@ -1,53 +1,66 @@
-<h1>Liste des blindtests enregistrés</h1>
-<!--
-    <mat-list>
-        <mat-list-item *ngFor="let blindtest of blindtests">
-            <p>
-                {{ blindtest.title }} - <i>par {{ blindtest.author }}</i>
-            </p>
-        </mat-list-item>
-    </mat-list>
--->
-<table mat-table [dataSource]="blindtests">
-    <ng-container matColumnDef="blindtestName">
-        <th mat-header-cell *matHeaderCellDef>Nom</th>
-        <td mat-cell *matCellDef="let blindtest">{{ blindtest.title }}</td>
-        <td mat-footer-cell *matFooterCellDef></td>
-    </ng-container>
-    <ng-container matColumnDef="author">
-        <th mat-header-cell *matHeaderCellDef>Auteur</th>
-        <td mat-cell *matCellDef="let blindtest">{{ blindtest.author }}</td>
-        <td mat-footer-cell *matFooterCellDef></td>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let blindtest">
-            <button
-                mat-mini-fab
-                color="primary"
-                matTooltip="Voir Détails"
-                (click)="viewBlindtest(blindtest)"
-            >
-                <mat-icon aria-label="Voir détails">view_headline</mat-icon>
-            </button>
-        </td>
-        <td mat-footer-cell *matFooterCellDef>
-            <button
-                mat-mini-fab
-                color="primary"
-                matTooltip="Créer un nouveau blindtest"
-                (click)="addNewBlindtest()"
-            >
-                <mat-icon aria-label="Créer un nouveau blindtest"
-                    >add_to_photos</mat-icon
-                >
-            </button>
-        </td>
-    </ng-container>
+<div class="container">
+    <mat-card>
+        <mat-card-header>
+            <mat-toolbar color="primary">
+                <h1>Liste des blindtests enregistrés</h1>
+            </mat-toolbar>
+        </mat-card-header>
+        <table mat-table [dataSource]="blindtests">
+            <ng-container matColumnDef="blindtestName">
+                <th mat-header-cell *matHeaderCellDef>Nom</th>
+                <td mat-cell *matCellDef="let blindtest">
+                    {{ blindtest.title }}
+                </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+            <ng-container matColumnDef="author">
+                <th mat-header-cell *matHeaderCellDef>Auteur</th>
+                <td mat-cell *matCellDef="let blindtest">
+                    {{ blindtest.author }}
+                </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let blindtest">
+                    <button
+                        mat-mini-fab
+                        color="primary"
+                        matTooltip="Configurer"
+                        (click)="viewBlindtest(blindtest)"
+                    >
+                        <mat-icon aria-label="Configurer">tune</mat-icon>
+                    </button>
+                    <button
+                        mat-mini-fab
+                        color="primary"
+                        matTooltip="Lancer le blindtest"
+                        [disabled]="!isValid(blindtest)"
+                        routerLink="/blindtest/{{ blindtest.id }}/play"
+                    >
+                        <mat-icon>play_arrow</mat-icon>
+                    </button>
+                </td>
+                <td mat-footer-cell *matFooterCellDef>
+                    <button
+                        mat-mini-fab
+                        color="primary"
+                        matTooltip="Créer un nouveau blindtest"
+                        (click)="addNewBlindtest()"
+                    >
+                        <mat-icon aria-label="Créer un nouveau blindtest"
+                            >add_to_photos</mat-icon
+                        >
+                    </button>
+                </td>
+            </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-    <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
-    <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
-</table>
-
-<!-- {{ blindtests | json }} -->
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+            <tr
+                mat-row
+                *matRowDef="let myRowData; columns: columnsToDisplay"
+            ></tr>
+            <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
+        </table>
+    </mat-card>
+</div>

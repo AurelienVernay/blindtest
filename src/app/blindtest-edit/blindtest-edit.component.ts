@@ -2,7 +2,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Theme } from './../models/theme.model';
 import { BlindtestService } from './../services/blindtest.service';
 import { Blindtest } from './../models/blindtest.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
@@ -14,7 +14,7 @@ import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.componen
     templateUrl: './blindtest-edit.component.html',
     styleUrls: ['./blindtest-edit.component.css'],
 })
-export class BlindtestEditComponent implements OnInit {
+export class BlindtestEditComponent implements OnInit, OnDestroy {
     private _$blindtest: Observable<Blindtest>;
     private subscription: Subscription;
     public get $blindtest() {
@@ -68,47 +68,72 @@ export class BlindtestEditComponent implements OnInit {
         );
     }
 
+    ngOnDestroy(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+    }
+
     public onUpdateTheme(theme: Theme) {
-        this.$blindtest = this.btService.update({
-            ...this.blindtest,
-            themes: [
-                ...this.blindtest.themes.filter(find => find.id !== theme.id),
-                theme,
-            ],
-        });
+        this.$blindtest = this.btService.update(
+            new Blindtest(
+                this.blindtest.id,
+                this.blindtest.title,
+                this.blindtest.author,
+                [
+                    ...this.blindtest.themes.filter(
+                        find => find.id !== theme.id
+                    ),
+                    theme,
+                ]
+            )
+        );
     }
     public onAddTheme() {
         this.dialogRef = this.dialog.open(AddThemeFormComponent);
         this.dialogRef.afterClosed().subscribe(themeName => {
             if (themeName) {
-                this.$blindtest = this.btService.update({
-                    ...this.blindtest,
-                    themes: [
-                        ...this.themes,
-                        {
-                            name: themeName,
-                            tracks: [],
-                            order: this.themes.length + 1,
-                        },
-                    ],
-                });
+                this.$blindtest = this.btService.update(
+                    new Blindtest(
+                        this.blindtest.id,
+                        this.blindtest.title,
+                        this.blindtest.author,
+                        [
+                            ...this.themes,
+                            new Theme(
+                                [],
+                                themeName,
+                                null,
+                                this.themes.length + 1
+                            ),
+                        ]
+                    )
+                );
             }
         });
     }
 
     public onDeleteTheme(theme: Theme) {
-        this.$blindtest = this.btService.update({
-            ...this.blindtest,
-            themes: [...this.themes.filter(find => find.id !== theme.id)],
-        });
+        this.$blindtest = this.btService.update(
+            new Blindtest(
+                this.blindtest.id,
+                this.blindtest.title,
+                this.blindtest.author,
+                [...this.themes.filter(find => find.order !== theme.order)],
+                this.blindtest.gloubi
+            )
+        );
     }
     public onAddGloubi() {
-        this.$blindtest = this.btService.update({
-            ...this.blindtest,
-            gloubi: {
-                tracks: [],
-            },
-        });
+        this.$blindtest = this.btService.update(
+            new Blindtest(
+                this.blindtest.id,
+                this.blindtest.title,
+                this.blindtest.author,
+                this.blindtest.themes,
+                new Theme([])
+            )
+        );
     }
 
     public onUpdateBlindtest() {
@@ -118,16 +143,18 @@ export class BlindtestEditComponent implements OnInit {
         });
     }
     public onUpdateGloubi(gloubi: Theme) {
-        this.$blindtest = this.btService.update({
-            ...this.blindtest,
-            gloubi: { ...gloubi },
-        });
+        this.$blindtest = this.btService.update(
+            new Blindtest(
+                this.blindtest.id,
+                this.blindtest.title,
+                this.blindtest.author,
+                this.blindtest.themes,
+                new Theme(gloubi.tracks)
+            )
+        );
     }
     public onDeleteGloubi() {
-        const blindtest: Blindtest = {
-            ...this.blindtest,
-        };
-        delete blindtest.gloubi;
-        this.$blindtest = this.btService.update(blindtest);
+        delete this.blindtest.gloubi;
+        this.$blindtest = this.btService.update(this.blindtest);
     }
 }

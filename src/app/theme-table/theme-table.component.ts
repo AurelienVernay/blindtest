@@ -68,24 +68,33 @@ export class ThemeTableComponent implements OnInit {
                 tracks.forEach(
                     (unorderedTrack, i) => (unorderedTrack.order = i + 1)
                 );
-                this.updateTheme.emit({
-                    ...this.theme,
-                    tracks: [...tracks],
-                });
+                this.updateTheme.emit(
+                    new Theme(
+                        [...tracks],
+                        this.theme.name,
+                        this.theme.id,
+                        this.theme.order
+                    )
+                );
             }
         });
     }
     public onAddTrack() {
         this.trackForm.controls['order'].enable();
-        this.updateTheme.emit({
-            ...this.theme,
-            tracks: [
-                ...this.theme.tracks,
-                {
-                    ...this.trackForm.value,
-                },
-            ],
-        });
+        this.updateTheme.emit(
+            new Theme(
+                [
+                    ...this.theme.tracks,
+                    {
+                        ...this.trackForm.value,
+                    },
+                ],
+                this.theme.name,
+                this.theme.id,
+                this.theme.order
+            )
+        );
+
         this.trackForm.controls['order'].disable();
     }
 
@@ -99,17 +108,21 @@ export class ThemeTableComponent implements OnInit {
         });
         this.dialogEdit.afterClosed().subscribe(result => {
             if (result) {
-                this.updateTheme.emit({
-                    ...this.theme,
-                    tracks: [
-                        ...this.theme.tracks.filter(
-                            find => find.order !== track.order
-                        ),
-                        {
-                            ...result,
-                        },
-                    ],
-                });
+                this.updateTheme.emit(
+                    new Theme(
+                        [
+                            ...this.theme.tracks.filter(
+                                find => find.order !== track.order
+                            ),
+                            {
+                                ...result,
+                            },
+                        ],
+                        this.theme.name,
+                        this.theme.id,
+                        this.theme.order
+                    )
+                );
             }
         });
     }

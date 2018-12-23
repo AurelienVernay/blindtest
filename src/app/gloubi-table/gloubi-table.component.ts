@@ -1,3 +1,4 @@
+import { EditTrackComponent } from './../edit-track/edit-track.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
@@ -11,6 +12,7 @@ import { ConfirmDeleteItemComponent } from '../confirm-delete-item/confirm-delet
     styleUrls: ['./gloubi-table.component.css'],
 })
 export class GloubiTableComponent implements OnInit {
+    private dialogEdit: MatDialogRef<EditTrackComponent>;
     private _gloubi: Theme;
     public get gloubi() {
         return this._gloubi;
@@ -29,6 +31,7 @@ export class GloubiTableComponent implements OnInit {
                 Validators.required
             ),
         });
+        this.gloubiForm.markAsPristine();
     }
     @Output() updateGloubi = new EventEmitter<Theme>();
     @Output() deleteGloubi = new EventEmitter();
@@ -48,22 +51,33 @@ export class GloubiTableComponent implements OnInit {
         );
         this.dialogCOnfirmDelete.afterClosed().subscribe(confirm => {
             if (confirm) {
-                this.updateGloubi.emit({
-                    ...this.gloubi,
-                    tracks: this.gloubi.tracks.filter(
-                        find => find.order !== track.order
-                    ),
-                });
+                this.updateGloubi.emit(
+                    new Theme(
+                        this.gloubi.tracks.filter(
+                            find => find.order !== track.order
+                        ),
+                        this.gloubi.name,
+                        this.gloubi.id
+                    )
+                );
             }
         });
     }
 
     public addNewTrack() {
         this.gloubiForm.controls['order'].enable();
-        this.updateGloubi.emit({
-            ...this.gloubi,
-            tracks: [...this.gloubi.tracks, this.gloubiForm.value],
-        });
+        this.updateGloubi.emit(
+            new Theme(
+                [
+                    ...this.gloubi.tracks,
+                    {
+                        ...this.gloubiForm.value,
+                    },
+                ],
+                this.gloubi.name,
+                this.gloubi.id
+            )
+        );
         this.gloubiForm.controls['order'].disable();
     }
 
@@ -75,6 +89,31 @@ export class GloubiTableComponent implements OnInit {
         this.dialogCOnfirmDelete.afterClosed().subscribe(confirm => {
             if (confirm) {
                 this.deleteGloubi.emit();
+            }
+        });
+    }
+
+    public editTrack(track: Track) {
+        this.dialogEdit = this.dialog.open(EditTrackComponent, {
+            data: { track: track, isGloubi: true },
+        });
+        this.dialogEdit.afterClosed().subscribe(result => {
+            if (result) {
+                this.updateGloubi.emit(
+                    new Theme(
+                        [
+                            ...this.gloubi.tracks.filter(
+                                find => find.order !== track.order
+                            ),
+                            {
+                                ...result,
+                            },
+                        ],
+                        this.gloubi.name,
+                        this.gloubi.id,
+                        this.gloubi.order
+                    )
+                );
             }
         });
     }

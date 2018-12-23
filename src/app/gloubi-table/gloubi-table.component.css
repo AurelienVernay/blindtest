@@ -17,3 +17,13 @@ table {
 ::ng-deep .mat-card {
     padding: 0 !important;
 }
+.actions-container {
+    display: flex;
+}
+.warning {
+    font-size: 3.2em;
+    align-self: flex-start;
+    text-shadow: 0px 3px 3px rgba(0, 0, 2, 0.2);
+    position: relative;
+    bottom: 3px;
+}

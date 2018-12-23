@@ -29,6 +29,7 @@ import { EditTrackComponent } from './edit-track/edit-track.component';
 import { ConfirmDeleteItemComponent } from './confirm-delete-item/confirm-delete-item.component';
 import { NouisliderModule } from 'ng2-nouislider';
 import { TimeFormatPipe } from './pipes/time-format.pipe';
+import { BlindtestPlayerComponent } from './blindtest-player/blindtest-player.component';
 
 const matModules = [
     MatListModule,
@@ -56,6 +57,7 @@ const matModules = [
         EditTrackComponent,
         ConfirmDeleteItemComponent,
         TimeFormatPipe,
+        BlindtestPlayerComponent,
     ],
     entryComponents: [
         CreateBlindtestFormComponent,

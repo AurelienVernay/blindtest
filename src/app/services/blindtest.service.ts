@@ -11,7 +11,7 @@ export class BlindtestService {
     public constructor(private http: HttpClient) {}
 
     public getAll(): Observable<Blindtest[]> {
-        return this.http.get<any[]>('http://localhost:3000/blindtests');
+        return this.http.get<Blindtest[]>('http://localhost:3000/blindtests');
     }
 
     public get(id: number): Observable<Blindtest> {
