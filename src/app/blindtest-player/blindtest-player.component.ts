@@ -2,7 +2,7 @@ import { Track } from './../models/track.model';
 import { Blindtest } from './../models/blindtest.model';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BlindtestService } from './../services/blindtest.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { Howl } from 'howler';
@@ -12,7 +12,7 @@ import { Howl } from 'howler';
     templateUrl: './blindtest-player.component.html',
     styleUrls: ['./blindtest-player.component.css'],
 })
-export class BlindtestPlayerComponent implements OnInit {
+export class BlindtestPlayerComponent implements OnInit, OnDestroy {
     private _$blindtest: Observable<Blindtest>;
     private subscription: Subscription;
     private _playing = false;
@@ -42,13 +42,16 @@ export class BlindtestPlayerComponent implements OnInit {
     get tracklist() {
         return this._tracklist.sort((a, b) => a.playOrder - b.playOrder);
     }
-    private _trackSelected: number;
+    private _trackSelected = 1;
 
     get trackSelected() {
         return this._trackSelected;
     }
 
     set trackSelected(idx: number) {
+        if (this.howl && this.idPlaying) {
+            this.howl.stop(this.idPlaying);
+        }
         this._trackSelected = idx;
         if (this.tracklist) {
             const track = this.tracklist[this.trackSelected - 1];
@@ -60,6 +63,11 @@ export class BlindtestPlayerComponent implements OnInit {
                         (track.durationRange[1] - track.durationRange[0]) *
                             1000,
                     ],
+                },
+                onload: () => {
+                    if (this.playing) {
+                        this.howl.play('preview');
+                    }
                 },
                 onloaderror: (id, error) => console.error(id, error),
                 onplayerror: (id, error) => console.error(id, error),
@@ -94,6 +102,7 @@ export class BlindtestPlayerComponent implements OnInit {
                 });
                 this.tracklist.push(...blindtest.gloubi.tracks);
             }
+            // affect to set first time sound
             this.trackSelected = 1;
             this.loading = false;
         });
@@ -114,16 +123,29 @@ export class BlindtestPlayerComponent implements OnInit {
         );
     }
 
+    ngOnDestroy(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+        Howler.unload();
+    }
+
     togglePlay() {
         this.playing = !this.playing;
     }
 
     goToPrevious() {
+        if (this.howl) {
+            this.howl.stop(this.idPlaying);
+        }
         this.trackSelected--;
         this.fadeIn = true;
         this.playing = true;
     }
     goToNext() {
+        if (this.howl) {
+            this.howl.stop(this.idPlaying);
+        }
         this.trackSelected++;
         this.fadeIn = true;
         this.playing = true;

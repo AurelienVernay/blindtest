@@ -85,7 +85,8 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
                         find => find.id !== theme.id
                     ),
                     theme,
-                ]
+                ],
+                this.blindtest.gloubi
             )
         );
     }
