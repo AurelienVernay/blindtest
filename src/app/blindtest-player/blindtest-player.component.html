@@ -25,6 +25,11 @@
                     [ngClass]="{ selected: track.playOrder === trackSelected }"
                 ></tr>
             </table>
+
+            <!--<mat-progress-bar
+                mode="determinate"
+                [value]="progress | async"
+            ></mat-progress-bar>-->
         </mat-card-content>
         <mat-card-actions>
             <mat-toolbar [ngStyle]="{ 'justify-content': 'space-around' }">

@@ -4,7 +4,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BlindtestService } from './../services/blindtest.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
 import { Howl } from 'howler';
 
 @Component({
@@ -22,6 +22,7 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
         return this._playing;
     }
     set playing(val: boolean) {
+        console.log(val ? 'playing ' : 'pausing ', this.trackSelected);
         this._playing = val;
         if (val) {
             if (this.fadeIn) {
@@ -65,8 +66,22 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
                     ],
                 },
                 onload: () => {
+                    console.log('audio loaded ! ', this.trackSelected);
                     if (this.playing) {
-                        this.howl.play('preview');
+                        console.log('playing', this.trackSelected);
+                        this.idPlaying = this.howl.play('preview');
+                    }
+                },
+                onend: () => {
+                    console.log('audio ended');
+                    if (this.trackSelected === this.tracklist.length) {
+                        this.playing = false;
+                        this.idPlaying = null;
+                        this.trackSelected = 1;
+                        console.log('blindtest ended ! ');
+                    } else {
+                        console.log('go to next');
+                        this.trackSelected++;
                     }
                 },
                 onloaderror: (id, error) => console.error(id, error),
@@ -135,19 +150,23 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
     }
 
     goToPrevious() {
-        if (this.howl) {
-            this.howl.stop(this.idPlaying);
-        }
+        console.log('go to previous');
         this.trackSelected--;
         this.fadeIn = true;
         this.playing = true;
     }
     goToNext() {
-        if (this.howl) {
-            this.howl.stop(this.idPlaying);
-        }
+        console.log('go to next');
         this.trackSelected++;
         this.fadeIn = true;
         this.playing = true;
+    }
+
+    get progress(): Observable<number> {
+        return of(
+            this.howl && this.howl.state() === 'loaded'
+                ? (+this.howl.seek() / this.howl.duration(this.idPlaying)) * 100
+                : 0
+        );
     }
 }

@@ -17,3 +17,14 @@
     color: #fff;
     font-weight: bolder;
 }
+
+.container {
+    width: 100%;
+    height: 1em;
+    background: rgba(200, 200, 200, 0.5);
+}
+.container .ruler {
+    transition: width 0.5s ease-in;
+    height: 1em;
+    background: rgba(103, 58, 183, 1);
+}
