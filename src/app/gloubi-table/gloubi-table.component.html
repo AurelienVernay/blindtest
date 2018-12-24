@@ -9,7 +9,7 @@
         </mat-toolbar>
     </mat-card-header>
     <form [formGroup]="gloubiForm">
-        <table mat-table [dataSource]="gloubi.tracks">
+        <table mat-table [dataSource]="tracks">
             <ng-container matColumnDef="order">
                 <th mat-header-cell *matHeaderCellDef>N° ordre</th>
                 <td mat-cell *matCellDef="let track">{{ track.order }}</td>
@@ -32,6 +32,7 @@
                 <th mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let track" class="actions-container">
                     <button
+                        type="button"
                         mat-mini-fab
                         color="primary"
                         matTooltip="Editer détails"
@@ -40,6 +41,7 @@
                         <mat-icon aria-label="Editer détails">tune</mat-icon>
                     </button>
                     <button
+                        type="button"
                         mat-mini-fab
                         color="warn"
                         matTooltip="Supprimer"

@@ -17,6 +17,11 @@ export class GloubiTableComponent implements OnInit {
     public get gloubi() {
         return this._gloubi;
     }
+    public get tracks() {
+        return this.gloubi
+            ? this.gloubi.tracks.sort((a, b) => a.order - b.order)
+            : [];
+    }
 
     @Input()
     public set gloubi(gloubi: Theme) {

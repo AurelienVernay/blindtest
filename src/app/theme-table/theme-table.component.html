@@ -42,7 +42,7 @@
         </mat-toolbar>
     </mat-card-header>
     <form [formGroup]="trackForm">
-        <table mat-table [dataSource]="theme.tracks">
+        <table mat-table [dataSource]="tracks">
             <ng-container matColumnDef="order">
                 <th mat-header-cell *matHeaderCellDef>N° ordre</th>
                 <td mat-cell *matCellDef="let track">{{ track.order }}</td>
@@ -111,6 +111,7 @@
                 <td mat-cell *matCellDef="let track" class="actions-container">
                     <button
                         mat-mini-fab
+                        type="button"
                         color="primary"
                         matTooltip="Editer"
                         (click)="onEditTrack(track)"
@@ -119,6 +120,7 @@
                     </button>
                     <button
                         mat-mini-fab
+                        type="button"
                         color="warn"
                         matTooltip="Supprimer"
                         (click)="onDeleteTrack(track)"

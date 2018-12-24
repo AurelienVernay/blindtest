@@ -17,6 +17,11 @@ export class ThemeTableComponent implements OnInit {
     private dialogConfirmDelete: MatDialogRef<ConfirmDeleteItemComponent>;
     readonly separatorKeysCodes: number[] = [ENTER, COMMA];
     @Input() public theme: Theme;
+    public get tracks() {
+        return this.theme
+            ? this.theme.tracks.sort((a, b) => a.order - b.order)
+            : [];
+    }
     public themeForm: FormGroup;
     public trackForm: FormGroup;
     public columnsToDisplay = [
