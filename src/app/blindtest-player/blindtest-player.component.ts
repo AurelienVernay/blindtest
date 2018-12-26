@@ -3,8 +3,8 @@ import { Blindtest } from './../models/blindtest.model';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BlindtestService } from './../services/blindtest.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { switchMap } from 'rxjs/operators';
-import { Observable, Subscription, of } from 'rxjs';
+import { switchMap, share, combineLatest } from 'rxjs/operators';
+import { Observable, Subscription, of, Subject, forkJoin } from 'rxjs';
 import { Howl } from 'howler';
 
 @Component({
@@ -15,25 +15,28 @@ import { Howl } from 'howler';
 export class BlindtestPlayerComponent implements OnInit, OnDestroy {
     private _$blindtest: Observable<Blindtest>;
     private subscription: Subscription;
-    private _playing = false;
     private idPlaying: number;
-    private fadeIn = true;
+
+    private _playing = false;
     get playing() {
         return this._playing;
     }
-    set playing(val: boolean) {
-        console.log(val ? 'playing ' : 'pausing ', this.trackSelected);
-        this._playing = val;
-        if (val) {
-            if (this.fadeIn) {
-                this.howl.fade(0, 1, 2000);
-            }
-            this.idPlaying = this.howl.play(this.idPlaying || 'preview');
-            this.fadeIn = false;
-        } else {
-            this.howl.pause(this.idPlaying);
-        }
+    set playing(value: boolean) {
+        this._playing = value;
+        this.playingSubject.next(value);
     }
+    public playingSubject = new Subject<boolean>();
+    private previousTrackSelection: number;
+    private _trackSelection = 1;
+    get trackSelection() {
+        return this._trackSelection;
+    }
+    set trackSelection(value: number) {
+        this.previousTrackSelection = this._trackSelection;
+        this._trackSelection = value;
+        this.trackSelectionSubject.next(value);
+    }
+    public trackSelectionSubject = new Subject<number>();
 
     private howl: Howl;
     private _tracklist: Track[] = [];
@@ -43,52 +46,7 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
     get tracklist() {
         return this._tracklist.sort((a, b) => a.playOrder - b.playOrder);
     }
-    private _trackSelected = 1;
 
-    get trackSelected() {
-        return this._trackSelected;
-    }
-
-    set trackSelected(idx: number) {
-        if (this.howl && this.idPlaying) {
-            this.howl.stop(this.idPlaying);
-        }
-        this._trackSelected = idx;
-        if (this.tracklist) {
-            const track = this.tracklist[this.trackSelected - 1];
-            this.howl = new Howl({
-                src: track.dataURI,
-                sprite: {
-                    preview: [
-                        track.durationRange[0] * 1000,
-                        (track.durationRange[1] - track.durationRange[0]) *
-                            1000,
-                    ],
-                },
-                onload: () => {
-                    console.log('audio loaded ! ', this.trackSelected);
-                    if (this.playing) {
-                        console.log('playing', this.trackSelected);
-                        this.idPlaying = this.howl.play('preview');
-                    }
-                },
-                onend: () => {
-                    console.log('audio ended');
-                    if (this.trackSelected === this.tracklist.length) {
-                        this.playing = false;
-                        this.idPlaying = null;
-                        this.trackSelected = 1;
-                        console.log('blindtest ended ! ');
-                    } else {
-                        console.log('go to next');
-                        this.trackSelected++;
-                    }
-                },
-                onloaderror: (id, error) => console.error(id, error),
-                onplayerror: (id, error) => console.error(id, error),
-            });
-        }
-    }
     public columnsToDisplay = ['playOrder'];
     public get $blindtest() {
         return this._$blindtest;
@@ -98,7 +56,7 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
             this.subscription.unsubscribe();
         }
         this._$blindtest = observable;
-        this.subscription = this._$blindtest.subscribe(blindtest => {
+        this._$blindtest.subscribe(blindtest => {
             this.loading = true;
             this.tracklist = [];
             let count = 1;
@@ -117,11 +75,65 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
                 });
                 this.tracklist.push(...blindtest.gloubi.tracks);
             }
-            // affect to set first time sound
-            this.trackSelected = 1;
+            this.subscription = this.trackSelectionSubject
+                .pipe(combineLatest(this.playingSubject))
+                .subscribe(([trackNumber, playing]) => {
+                    console.log('subscribe', trackNumber, playing);
+                    if (trackNumber === this.previousTrackSelection) {
+                        if (!playing && this.howl) {
+                            this.howl.pause(this.idPlaying);
+                        }
+                        if (playing && this.howl) {
+                            this.howl.play(this.idPlaying || 'preview');
+                        }
+                    } else {
+                        if (this.howl) {
+                            this.howl.unload();
+                        }
+                        const track = this.tracklist[trackNumber - 1];
+                        this.howl = new Howl({
+                            src: track.dataURI,
+                            sprite: {
+                                preview: [
+                                    track.durationRange[0] * 1000,
+                                    (track.durationRange[1] -
+                                        track.durationRange[0]) *
+                                        1000,
+                                ],
+                            },
+                            onload: () => {
+                                console.log('audio loaded', trackNumber);
+                                if (playing) {
+                                    console.log('playing', trackNumber);
+                                    this.idPlaying = this.howl.play('preview');
+                                }
+                            },
+                            onend: () => {
+                                console.log('audio ended');
+                                if (trackNumber === this.tracklist.length) {
+                                    this.playing = false;
+                                    this.idPlaying = null;
+                                    this.trackSelection = 1;
+                                    console.log('blindtest ended ! ');
+                                } else {
+                                    console.log('go to next');
+                                    this.trackSelection++;
+                                }
+                            },
+                            onloaderror: (id, error) =>
+                                console.error(id, error),
+                            onplayerror: (id, error) =>
+                                console.error(id, error),
+                        });
+                    }
+                });
+            // init first song
+            this.playing = false;
+            this.trackSelectionSubject.next(1);
             this.loading = false;
         });
     }
+    public progress: Observable<number> = Observable.create(observer => {});
     public blindtest: Blindtest;
     public loading = true;
 
@@ -143,30 +155,21 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
             this.subscription.unsubscribe();
         }
         Howler.unload();
+        this.playingSubject.unsubscribe();
+        this.trackSelectionSubject.unsubscribe();
     }
 
     togglePlay() {
+        console.log('play / pause');
         this.playing = !this.playing;
     }
 
     goToPrevious() {
         console.log('go to previous');
-        this.trackSelected--;
-        this.fadeIn = true;
-        this.playing = true;
+        this.trackSelection--;
     }
     goToNext() {
         console.log('go to next');
-        this.trackSelected++;
-        this.fadeIn = true;
-        this.playing = true;
-    }
-
-    get progress(): Observable<number> {
-        return of(
-            this.howl && this.howl.state() === 'loaded'
-                ? (+this.howl.seek() / this.howl.duration(this.idPlaying)) * 100
-                : 0
-        );
+        this.trackSelection++;
     }
 }

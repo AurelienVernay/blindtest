@@ -22,7 +22,7 @@
                 <tr
                     mat-row
                     *matRowDef="let track; columns: columnsToDisplay"
-                    [ngClass]="{ selected: track.playOrder === trackSelected }"
+                    [ngClass]="{ selected: track.playOrder === trackSelection }"
                 ></tr>
             </table>
 
@@ -33,35 +33,42 @@
         </mat-card-content>
         <mat-card-actions>
             <mat-toolbar [ngStyle]="{ 'justify-content': 'space-around' }">
-                <button
-                    mat-flat-button
-                    matTooltip="Extrait précédent"
-                    [disabled]="trackSelected === 1"
-                    (click)="goToPrevious()"
-                >
-                    <mat-icon>skip_previous</mat-icon>
-                </button>
-                <button
-                    mat-flat-button
-                    [matTooltip]="playing ? 'Pause' : 'Lecture'"
-                    (click)="togglePlay()"
-                >
-                    <mat-icon *ngIf="!playing; else pause">play_arrow</mat-icon>
-                    <ng-template #pause>
-                        <mat-icon>pause</mat-icon>
-                    </ng-template>
-                </button>
-                <button
-                    mat-flat-button
-                    matTooltip="Extrait suivant"
-                    [disabled]="tracklist.length === trackSelected"
-                    (click)="goToNext()"
-                >
-                    <mat-icon>skip_next</mat-icon>
-                </button>
-                <button mat-flat-button color="warn">
-                    <mat-icon>stop</mat-icon>
-                </button>
+                <div class="player-button">
+                    <button
+                        mat-flat-button
+                        matTooltip="Extrait précédent"
+                        [disabled]="trackSelection === 1"
+                        (click)="goToPrevious()"
+                    >
+                        <mat-icon>skip_previous</mat-icon>
+                    </button>
+                    <button
+                        mat-flat-button
+                        color="primary"
+                        [matTooltip]="
+                            (playingSubject | async) ? 'Pause' : 'Lecture'
+                        "
+                        (click)="togglePlay()"
+                    >
+                        <mat-icon *ngIf="!playing; else pause"
+                            >play_arrow</mat-icon
+                        >
+                        <ng-template #pause>
+                            <mat-icon>pause</mat-icon>
+                        </ng-template>
+                    </button>
+                    <button
+                        mat-flat-button
+                        matTooltip="Extrait suivant"
+                        [disabled]="tracklist.length === trackSelection"
+                        (click)="goToNext()"
+                    >
+                        <mat-icon>skip_next</mat-icon>
+                    </button>
+                    <button mat-flat-button color="warn">
+                        <mat-icon>stop</mat-icon>
+                    </button>
+                </div>
             </mat-toolbar>
         </mat-card-actions>
     </mat-card>
