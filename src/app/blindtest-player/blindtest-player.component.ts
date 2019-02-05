@@ -145,7 +145,7 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.$blindtest = this.route.paramMap.pipe(
             switchMap((params: ParamMap) =>
-                this.btService.get(+params.get('id'))
+                this.btService.get(params.get('id'))
             )
         );
     }

@@ -80,7 +80,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
     public loaded = false;
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        private data: { track: Track; isGloubi: boolean },
+        public data: { track: Track; isGloubi: boolean },
         private fb: FormBuilder
     ) {}
 

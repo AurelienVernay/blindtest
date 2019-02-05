@@ -11,25 +11,25 @@ export class BlindtestService {
     public constructor(private http: HttpClient) {}
 
     public getAll(): Observable<Blindtest[]> {
-        return this.http.get<Blindtest[]>('http://localhost:3000/blindtests');
+        return this.http.get<Blindtest[]>('http://localhost:9999/blindtests');
     }
 
-    public get(id: number): Observable<Blindtest> {
+    public get(id: string): Observable<Blindtest> {
         return this.http.get<Blindtest>(
-            `http://localhost:3000/blindtests/${id}`
+            `http://localhost:9999/blindtests/${id}`
         );
     }
 
     public update(blindtest: Blindtest): Observable<Blindtest> {
         return this.http.put<Blindtest>(
-            `http://localhost:3000/blindtests/${blindtest.id}`,
+            `http://localhost:9999/blindtests/${blindtest.id}`,
             blindtest
         );
     }
 
     public add(blindtest: Blindtest): Observable<Blindtest> {
         return this.http.post<Blindtest>(
-            `http://localhost:3000/blindtests`,
+            `http://localhost:9999/blindtests`,
             blindtest
         );
     }
