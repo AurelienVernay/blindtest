@@ -1,13 +1,13 @@
+import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.component';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Theme } from './../models/theme.model';
-import { BlindtestService } from './../services/blindtest.service';
-import { Blindtest } from './../models/blindtest.model';
+import { Theme } from '../../shared/models/theme.model';
+import { BlindtestService } from '../../shared/services/blindtest.service';
+import { Blindtest } from '../../shared/models/blindtest.model';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.component';
 
 @Component({
     selector: 'app-blindtest-edit',

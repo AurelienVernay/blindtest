@@ -1,9 +1,6 @@
-import { Blindtest } from './../models/blindtest.model';
-import { BlindtestService } from './../services/blindtest.service';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-create-blindtest-form',

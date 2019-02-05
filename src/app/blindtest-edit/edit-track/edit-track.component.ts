@@ -1,11 +1,12 @@
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Track } from './../models/track.model';
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Howl } from 'howler';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+
+import { Track } from '../../shared/models/track.model';
 
 @Component({
     selector: 'app-edit-track',

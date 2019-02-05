@@ -1,6 +1,6 @@
 import { CreateBlindtestFormComponent } from './../create-blindtest-form/create-blindtest-form.component';
-import { Blindtest } from './../models/blindtest.model';
-import { BlindtestService } from './../services/blindtest.service';
+import { Blindtest } from '../../shared/models/blindtest.model';
+import { BlindtestService } from '../../shared/services/blindtest.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';

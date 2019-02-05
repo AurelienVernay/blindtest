@@ -1,8 +1,8 @@
 import { BlindtestPlayerComponent } from './blindtest-player/blindtest-player.component';
-import { BlindtestEditComponent } from './blindtest-edit/blindtest-edit.component';
+import { BlindtestEditComponent } from './blindtest-edit/blindtest-edit/blindtest-edit.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { BlindtestsListComponent } from './blindtests-list/blindtests-list.component';
+import { BlindtestsListComponent } from './blindtests-list/blindtests-list/blindtests-list.component';
 
 const routes: Routes = [
     {

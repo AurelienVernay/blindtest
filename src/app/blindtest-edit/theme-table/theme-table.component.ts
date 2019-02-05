@@ -1,11 +1,12 @@
-import { EditTrackComponent } from './../edit-track/edit-track.component';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Theme } from '../models/theme.model';
-import { Track } from '../models/track.model';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ConfirmDeleteItemComponent } from '../confirm-delete-item/confirm-delete-item.component';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+
+import { ConfirmDeleteItemComponent } from '../../shared/confirm-delete-item/confirm-delete-item.component';
+import { Theme } from '../../shared/models/theme.model';
+import { Track } from '../../shared/models/track.model';
+import { EditTrackComponent } from './../edit-track/edit-track.component';
 
 @Component({
     selector: 'app-theme-table',

@@ -1,11 +1,12 @@
-import { Track } from './../models/track.model';
-import { Blindtest } from './../models/blindtest.model';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { BlindtestService } from './../services/blindtest.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { switchMap, share, combineLatest } from 'rxjs/operators';
-import { Observable, Subscription, of, Subject, forkJoin } from 'rxjs';
 import { Howl } from 'howler';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { combineLatest, switchMap } from 'rxjs/operators';
+
+import { Blindtest } from '../shared/models/blindtest.model';
+import { Track } from '../shared/models/track.model';
+import { BlindtestService } from '../shared/services/blindtest.service';
 
 @Component({
     selector: 'app-blindtest-player',
