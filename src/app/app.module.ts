@@ -1,3 +1,4 @@
+import { ConfigService } from './services/config.service';
 import { BlindtestService } from './services/blindtest.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -77,7 +78,7 @@ const matModules = [
         ...matModules,
         NouisliderModule,
     ],
-    providers: [BlindtestService],
+    providers: [BlindtestService, ConfigService],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

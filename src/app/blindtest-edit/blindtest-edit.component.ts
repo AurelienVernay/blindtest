@@ -77,7 +77,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     public onUpdateTheme(theme: Theme) {
         this.$blindtest = this.btService.update(
             new Blindtest(
-                this.blindtest.id,
+                this.blindtest._id,
                 this.blindtest.title,
                 this.blindtest.author,
                 [
@@ -96,7 +96,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
             if (themeName) {
                 this.$blindtest = this.btService.update(
                     new Blindtest(
-                        this.blindtest.id,
+                        this.blindtest._id,
                         this.blindtest.title,
                         this.blindtest.author,
                         [
@@ -117,7 +117,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     public onDeleteTheme(theme: Theme) {
         this.$blindtest = this.btService.update(
             new Blindtest(
-                this.blindtest.id,
+                this.blindtest._id,
                 this.blindtest.title,
                 this.blindtest.author,
                 [...this.themes.filter(find => find.order !== theme.order)],
@@ -128,7 +128,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     public onAddGloubi() {
         this.$blindtest = this.btService.update(
             new Blindtest(
-                this.blindtest.id,
+                this.blindtest._id,
                 this.blindtest.title,
                 this.blindtest.author,
                 this.blindtest.themes,
@@ -146,7 +146,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     public onUpdateGloubi(gloubi: Theme) {
         this.$blindtest = this.btService.update(
             new Blindtest(
-                this.blindtest.id,
+                this.blindtest._id,
                 this.blindtest.title,
                 this.blindtest.author,
                 this.blindtest.themes,

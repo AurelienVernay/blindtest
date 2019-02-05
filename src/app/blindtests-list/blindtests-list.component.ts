@@ -27,14 +27,14 @@ export class BlindtestsListComponent implements OnInit {
     }
 
     public viewBlindtest(blindtest: Blindtest) {
-        this.router.navigate([`blindtest/${blindtest.id}`]);
+        this.router.navigate([`blindtest/${blindtest._id}`]);
     }
     public addNewBlindtest() {
         this.dialogRef = this.dialog.open(CreateBlindtestFormComponent);
         this.dialogRef.afterClosed().subscribe(blindtest => {
             if (blindtest && blindtest.title) {
                 this.btService.add(blindtest).subscribe(createdBlindtest => {
-                    this.router.navigate([`blindtest/${createdBlindtest.id}`]);
+                    this.router.navigate([`blindtest/${createdBlindtest._id}`]);
                 });
             }
         });

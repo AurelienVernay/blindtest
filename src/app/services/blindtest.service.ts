@@ -1,4 +1,4 @@
-import { Theme } from './../models/theme.model';
+import { ConfigService } from './config.service';
 import { Blindtest } from './../models/blindtest.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -8,28 +8,33 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class BlindtestService {
-    public constructor(private http: HttpClient) {}
+    public constructor(
+        private http: HttpClient,
+        private cfgService: ConfigService
+    ) {}
 
     public getAll(): Observable<Blindtest[]> {
-        return this.http.get<Blindtest[]>('http://localhost:9999/blindtests');
+        return this.http.get<Blindtest[]>(
+            `${this.cfgService.paths.api}/blindtests`
+        );
     }
 
     public get(id: string): Observable<Blindtest> {
         return this.http.get<Blindtest>(
-            `http://localhost:9999/blindtests/${id}`
+            `${this.cfgService.paths.api}/blindtests/${id}`
         );
     }
 
     public update(blindtest: Blindtest): Observable<Blindtest> {
         return this.http.put<Blindtest>(
-            `http://localhost:9999/blindtests/${blindtest.id}`,
+            `${this.cfgService.paths.api}/blindtests/${blindtest._id}`,
             blindtest
         );
     }
 
     public add(blindtest: Blindtest): Observable<Blindtest> {
         return this.http.post<Blindtest>(
-            `http://localhost:9999/blindtests`,
+            `${this.cfgService.paths.api}/blindtests`,
             blindtest
         );
     }

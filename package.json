@@ -11,7 +11,8 @@
         "e2e": "ng e2e",
         "json-server": "json-server --watch db.json",
         "electron": "electron .",
-        "electron-build": "ng build --prod && electron ."
+        "electron-build": "ng build --prod && electron .",
+        "backend": "node backend.js"
     },
     "private": true,
     "dependencies": {

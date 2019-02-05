@@ -36,7 +36,7 @@
                         color="primary"
                         matTooltip="Lancer le blindtest"
                         [disabled]="!isValid(blindtest)"
-                        routerLink="/blindtest/{{ blindtest.id }}/play"
+                        routerLink="/blindtest/{{ blindtest._id }}/play"
                     >
                         <mat-icon>play_arrow</mat-icon>
                     </button>
