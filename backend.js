@@ -16,6 +16,8 @@ try {
         expressApp = express();
         const port = 9999;
         expressApp.use(bodyParser.json({ limit: '50mb' })); // for parsing application/json
+        expressApp.use(express.static(__dirname + '/dist/blindtest'));
+
         expressApp.get('/api/blindtests', (req, res) => {
             console.log('getting all blindtests');
             dbClient
@@ -80,8 +82,9 @@ try {
             res.sendStatus(200);
         });
 
-        expressApp.use(express.static(__dirname + '/dist/blindtest'));
-
+        expressApp.get('/*', function(req, res) {
+            res.sendFile(__dirname + '/dist/blindtest/index.html');
+        });
         expressApp.listen(port, () =>
             console.log(`Blindtest listening on port ${port}...`)
         );
