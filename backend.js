@@ -15,7 +15,7 @@ try {
         const express = require('express');
         expressApp = express();
         const port = 9999;
-        expressApp.use(bodyParser.json()); // for parsing application/json
+        expressApp.use(bodyParser.json({ limit: '50mb' })); // for parsing application/json
         expressApp.get('/api/blindtests', (req, res) => {
             console.log('getting all blindtests');
             dbClient
@@ -51,22 +51,33 @@ try {
                 req.body
             );
             const oId = new mongoDb.ObjectID(req.params.blindtestId);
-            dbClient
-                .collection('blindtest')
-                .findOneAndReplace(
-                    { _id: oId },
-                    {
-                        title: req.body.title,
-                        author: req.body.author,
-                        themes: req.body.themes,
-                    }
-                )
-                .then(
-                    result => res.send(result),
-                    err => {
-                        throw err;
-                    }
-                );
+            dbClient.collection('blindtest').findOneAndReplace(
+                { _id: oId },
+                {
+                    title: req.body.title,
+                    author: req.body.author,
+                    themes: req.body.themes,
+                },
+                () =>
+                    dbClient
+                        .collection('blindtest')
+                        .findOne({ _id: oId })
+                        .then(
+                            result => {
+                                res.send(result);
+                            },
+                            err => {
+                                throw err;
+                            }
+                        )
+
+            );
+        });
+
+        expressApp.delete('/api/blindtests/:blindtestId', (req, res) => {
+            const oId = new mongoDb.ObjectID(req.params.blindtestId);
+            MongoClient.collection('blindtest').delete({ _id: oId });
+            res.sendStatus(200);
         });
 
         expressApp.use(express.static(__dirname + '/dist/blindtest'));
@@ -76,5 +87,6 @@ try {
         );
     });
 } catch (e) {
+    console.error(e);
     exit(-1);
 }

@@ -1,5 +1,6 @@
+import { ExtractResponseInterceptor } from './interceptors/extract-response-nterceptor';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -62,6 +63,15 @@ const matModules = [
         TimeFormatPipe,
         RouterModule,
     ],
-    providers: [BlindtestService, ConfigService],
+    providers: [
+        BlindtestService,
+        ConfigService,
+        ExtractResponseInterceptor,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: ExtractResponseInterceptor,
+            multi: true,
+        },
+    ],
 })
 export class SharedModule {}
