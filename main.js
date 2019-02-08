@@ -1,18 +1,19 @@
 const { app, BrowserWindow } = require('electron');
+const backend = require('./backend');
 let win;
 console.log('Bootstrapping electron');
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 600,
-        height: 600,
+        width: 1024,
+        height: 768,
         backgroundColor: '#ffffff',
-        icon: `file://${__dirname}/dist/blindtest/favicon.png`,
+        icon: `http://localhost:9999/favicon.png`,
     });
 
-    win.loadURL(`file://${__dirname}/dist/blindtest/index.html`);
+    win.loadURL(`http://localhost:9999`);
     //// uncomment below to open the DevTools.
-    // win.webContents.openDevTools()
+    // win.webContents.openDevTools();
 
     // Event when the window is closed.
     win.on('closed', function() {
@@ -20,9 +21,9 @@ function createWindow() {
     });
 }
 
-// Create window on electron intialization
+// Call backend bootstrap with window on electron intialization on callback
 app.on('ready', () => {
-    createWindow();
+    backend.bootstrapBackend(createWindow);
 });
 
 // Quit when all windows are closed.
@@ -30,8 +31,7 @@ app.on('window-all-closed', function() {
     // On macOS specific close process
     if (process.platform !== 'darwin') {
         app.quit();
-        // dbClient.close();
-        // expressApp.close();
+        // backend.expressApp.close();
     }
 });
 
