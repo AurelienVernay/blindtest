@@ -2,7 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Main Process",
+            "type": "node",
+            "request": "launch",
+            "name": "Debug backend",
+            "program": "${workspaceFolder}/main.js",
+            "args": ["--backend"]
+        },
+        {
+            "name": "Debug Main Process with Electron",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}",

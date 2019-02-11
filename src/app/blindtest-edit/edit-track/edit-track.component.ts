@@ -1,3 +1,4 @@
+import { TrackService } from './../../shared/services/track.service';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -57,10 +58,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
         this._previewDuration = Math.round(duration);
     }
     public durationSelected = 0;
-    public get track() {
-        return this.data.track;
-    }
-
+    public track: Track;
     get playing() {
         return this._playing;
     }
@@ -81,26 +79,49 @@ export class EditTrackComponent implements OnInit, OnDestroy {
     public loaded = false;
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        public data: { track: Track; isGloubi: boolean },
-        private fb: FormBuilder
+        public data: { trackId: string; isGloubi: boolean },
+        private fb: FormBuilder,
+        private trackService: TrackService
     ) {}
 
     ngOnInit() {
         this.trackForm = this.fb.group({
-            title: this.fb.control(this.track.title, Validators.required),
-            durationRange: this.fb.control(
-                this.track.durationRange,
-                Validators.required
-            ),
-            dataURI: this.fb.control(this.track.dataURI, Validators.required),
-            order: this.fb.control(this.track.order),
+            title: this.fb.control(null, Validators.required),
+            data: this.fb.group({
+                base64: this.fb.control(null, Validators.required),
+                offset: this.fb.control(null, Validators.required),
+                duration: this.fb.control(null, Validators.required),
+            }),
+            order: this.fb.control(null),
+            artists: this.fb.control([], Validators.required),
         });
-        if (!this.data.isGloubi) {
-            this.trackForm.addControl(
-                'artists',
-                this.fb.control(this.track.artists, Validators.required)
+        this.trackService.get(this.data.trackId, true).subscribe(track => {
+            this.trackForm.setControl(
+                'data',
+                this.fb.group({
+                    base64: this.fb.control(
+                        track.data.base64,
+                        Validators.required
+                    ),
+                    offset: this.fb.control(
+                        track.data.offset,
+                        Validators.required
+                    ),
+                    duration: this.fb.control(
+                        track.data.duration,
+                        Validators.required
+                    ),
+                })
             );
-        }
+            if (!this.data.isGloubi) {
+                this.trackForm.addControl(
+                    'artists',
+                    this.fb.control(track.artists, Validators.required)
+                );
+            }
+            this.loading = true;
+            this.computeSound();
+        });
         this.durationSubscription = this.trackForm.valueChanges.subscribe(
             values => {
                 if (values.durationRange) {
@@ -109,20 +130,12 @@ export class EditTrackComponent implements OnInit, OnDestroy {
                 }
             }
         );
-        this.dataURISubscription = this.trackForm.controls[
-            'dataURI'
-        ].valueChanges.subscribe(() => {
-            this.loading = true;
-            this.computeSound();
-        });
-        if (this.track.dataURI) {
-            this.loading = true;
-            this.computeSound();
-        }
-        if (this.track.durationRange) {
-            this.durationSelected =
-                this.track.durationRange[1] - this.track.durationRange[0];
-        }
+        this.dataURISubscription = this.trackForm
+            .get('data')
+            .valueChanges.subscribe(() => {
+                this.loading = true;
+                this.computeSound();
+            });
     }
 
     ngOnDestroy(): void {
@@ -173,7 +186,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
                 this.previewDuration = this.howler.duration();
                 this.loading = false;
                 this.loaded = true;
-                if (!this.track.durationRange) {
+                if (!this.track.data) {
                     this.trackForm.setControl(
                         'durationRange',
                         this.fb.control(

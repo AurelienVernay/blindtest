@@ -1,17 +1,10 @@
+import { TrackData } from './track-data.model';
+
 export class Track {
-    id: number;
+    _id: string;
     order?: number;
     artists?: string[];
     title: string;
-    durationRange?: number[];
-    dataURI?: string;
     playOrder?: number;
-
-    public static isValid(track: Track): boolean {
-        return (
-            track.dataURI &&
-            track.durationRange &&
-            track.durationRange.length === 2
-        );
-    }
+    data?: TrackData;
 }

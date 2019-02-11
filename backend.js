@@ -1,5 +1,3 @@
-//Init MongoDB Client, boot up app after
-
 module.exports = {
     bootstrapBackend: callback => {
         const MongoClient = require('mongodb').MongoClient;
@@ -11,7 +9,6 @@ module.exports = {
                 client
             ) {
                 if (err) throw err;
-
                 dbClient = client.db('blindtest');
                 // Express part - serve local endpoints
                 const express = require('express');
@@ -93,14 +90,30 @@ module.exports = {
                         res.sendStatus(200);
                     }
                 );
-
+                expressApp.get('/api/track-datas/:trackId', (req, res) => {
+                    const oId = new mongoDb.ObjectID(req.params.trackId);
+                    dbClient
+                        .collection('track')
+                        .findOne({
+                            _id: oId,
+                        })
+                        .then(
+                            result => res.send(result),
+                            err => {
+                                throw err;
+                            }
+                        );
+                    res.send(null);
+                });
                 expressApp.get('/*', function(req, res) {
                     res.sendFile(__dirname + '/dist/blindtest/index.html');
                 });
                 expressApp.listen(port, () => {
                     console.log(`Blindtest listening on port ${port}...`);
-                    console.log('calling callback now...');
-                    callback();
+                    if (callback) {
+                        console.log('calling callback now...');
+                        callback();
+                    }
                 });
             });
         } catch (e) {

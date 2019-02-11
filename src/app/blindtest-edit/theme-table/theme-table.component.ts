@@ -110,7 +110,7 @@ export class ThemeTableComponent implements OnInit {
 
     public onEditTrack(track: Track) {
         this.dialogEdit = this.dialog.open(EditTrackComponent, {
-            data: { track: track, isGloubi: false },
+            data: { trackId: track._id, isGloubi: false },
         });
         this.dialogEdit.afterClosed().subscribe(result => {
             if (result) {
@@ -135,10 +135,7 @@ export class ThemeTableComponent implements OnInit {
     public getThemeDuration() {
         let sum = 0;
         this.theme.tracks.forEach(
-            track =>
-                (sum += track.durationRange
-                    ? track.durationRange[1] - track.durationRange[0]
-                    : 0)
+            track => (sum += track.data ? track.data.duration : 0)
         );
         return sum;
     }

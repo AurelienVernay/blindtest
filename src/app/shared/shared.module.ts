@@ -24,6 +24,7 @@ import { TimeFormatPipe } from './pipes/time-format.pipe';
 import { BlindtestService } from './services/blindtest.service';
 import { ConfigService } from './services/config.service';
 import { RouterModule } from '@angular/router';
+import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 
 const matModules = [
     MatListModule,
@@ -41,7 +42,11 @@ const matModules = [
 ];
 
 @NgModule({
-    declarations: [TimeFormatPipe, ConfirmDeleteItemComponent],
+    declarations: [
+        TimeFormatPipe,
+        ConfirmDeleteItemComponent,
+        LoadingSpinnerComponent,
+    ],
     imports: [
         CommonModule,
         BrowserModule,
@@ -62,6 +67,7 @@ const matModules = [
         NouisliderModule,
         TimeFormatPipe,
         RouterModule,
+        LoadingSpinnerComponent,
     ],
     providers: [
         BlindtestService,

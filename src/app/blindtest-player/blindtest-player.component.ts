@@ -93,13 +93,11 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
                         }
                         const track = this.tracklist[trackNumber - 1];
                         this.howl = new Howl({
-                            src: track.dataURI,
+                            src: track.data.base64,
                             sprite: {
                                 preview: [
-                                    track.durationRange[0] * 1000,
-                                    (track.durationRange[1] -
-                                        track.durationRange[0]) *
-                                        1000,
+                                    track.data.offset * 1000,
+                                    track.data.duration * 1000,
                                 ],
                             },
                             onload: () => {

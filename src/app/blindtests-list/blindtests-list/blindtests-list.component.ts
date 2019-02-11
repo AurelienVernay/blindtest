@@ -41,6 +41,6 @@ export class BlindtestsListComponent implements OnInit {
     }
 
     public isValid(blindtest: Blindtest) {
-        return Blindtest.isValid(blindtest);
+        return false;
     }
 }
