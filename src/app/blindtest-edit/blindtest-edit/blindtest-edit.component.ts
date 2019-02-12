@@ -82,7 +82,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
                 this.blindtest.author,
                 [
                     ...this.blindtest.themes.filter(
-                        find => find.id !== theme.id
+                        find => find.order !== theme.order
                     ),
                     theme,
                 ],
@@ -101,12 +101,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
                         this.blindtest.author,
                         [
                             ...this.themes,
-                            new Theme(
-                                [],
-                                themeName,
-                                null,
-                                this.themes.length + 1
-                            ),
+                            new Theme([], themeName, this.themes.length + 1),
                         ]
                     )
                 );

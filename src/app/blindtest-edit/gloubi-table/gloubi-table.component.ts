@@ -62,8 +62,7 @@ export class GloubiTableComponent implements OnInit {
                         this.gloubi.tracks.filter(
                             find => find.order !== track.order
                         ),
-                        this.gloubi.name,
-                        this.gloubi.id
+                        this.gloubi.name
                     )
                 );
             }
@@ -80,8 +79,7 @@ export class GloubiTableComponent implements OnInit {
                         ...this.gloubiForm.value,
                     },
                 ],
-                this.gloubi.name,
-                this.gloubi.id
+                this.gloubi.name
             )
         );
         this.gloubiForm.controls['order'].disable();
@@ -116,7 +114,6 @@ export class GloubiTableComponent implements OnInit {
                             },
                         ],
                         this.gloubi.name,
-                        this.gloubi.id,
                         this.gloubi.order
                     )
                 );

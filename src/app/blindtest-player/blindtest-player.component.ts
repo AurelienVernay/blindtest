@@ -79,7 +79,6 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
             this.subscription = this.trackSelectionSubject
                 .pipe(combineLatest(this.playingSubject))
                 .subscribe(([trackNumber, playing]) => {
-                    console.log('subscribe', trackNumber, playing);
                     if (trackNumber === this.previousTrackSelection) {
                         if (!playing && this.howl) {
                             this.howl.pause(this.idPlaying);
@@ -92,12 +91,13 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
                             this.howl.unload();
                         }
                         const track = this.tracklist[trackNumber - 1];
+                        //TODO track.data.base64
                         this.howl = new Howl({
-                            src: track.data.base64,
+                            src: null,
                             sprite: {
                                 preview: [
-                                    track.data.offset * 1000,
-                                    track.data.duration * 1000,
+                                    track.offset * 1000,
+                                    track.duration * 1000,
                                 ],
                             },
                             onload: () => {

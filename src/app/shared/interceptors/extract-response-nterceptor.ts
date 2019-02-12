@@ -4,6 +4,7 @@ import {
     HttpInterceptor,
     HttpRequest,
     HttpResponse,
+    HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
@@ -28,7 +29,9 @@ export class ExtractResponseInterceptor implements HttpInterceptor {
                 return event;
             }),
             catchError(error => {
-                console.error(error);
+                if (error instanceof HttpErrorResponse) {
+                    console.error(error.error);
+                }
                 return of(error);
             })
         );

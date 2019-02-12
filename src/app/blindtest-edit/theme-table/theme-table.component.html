@@ -41,121 +41,80 @@
             </button>
         </mat-toolbar>
     </mat-card-header>
-    <form [formGroup]="trackForm">
-        <table mat-table [dataSource]="tracks">
-            <ng-container matColumnDef="order">
-                <th mat-header-cell *matHeaderCellDef>N° ordre</th>
-                <td mat-cell *matCellDef="let track">{{ track.order }}</td>
-                <td mat-footer-cell *matFooterCellDef>
-                    <mat-form-field>
-                        <input matInput type="number" formControlName="order" />
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="artists">
-                <th mat-header-cell *matHeaderCellDef>Artiste(s)</th>
-                <td mat-cell *matCellDef="let track">
-                    <span *ngFor="let artist of track.artists; last as last"
-                        >{{ artist }} <span *ngIf="!last"> - </span>
-                    </span>
-                </td>
-                <td mat-footer-cell *matFooterCellDef>
-                    <mat-chip-list #chipList>
-                        <mat-chip
-                            *ngFor="
-                                let artist of trackForm.controls['artists']
-                                    .value
-                            "
-                            [selectable]="true"
-                            [removable]="true"
-                            (removed)="removeArtistFromTrack(artist)"
-                        >
-                            {{ artist }}
-                            <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input
-                            placeholder="Artistes..."
-                            [matChipInputFor]="chipList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                            [matChipInputAddOnBlur]="true"
-                            (matChipInputTokenEnd)="addNewArtistToTrack($event)"
-                        />
-                    </mat-chip-list>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="title">
-                <th mat-header-cell *matHeaderCellDef>Titre</th>
-                <td mat-cell *matCellDef="let track">{{ track.title }}</td>
-                <td mat-footer-cell *matFooterCellDef>
-                    <mat-form-field>
-                        <input matInput type="text" formControlName="title" />
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="duration">
-                <th mat-header-cell *matHeaderCellDef>Durée de l'extrait</th>
-                <td mat-cell *matCellDef="let track">
-                    {{
-                        track.durationRange
-                            ? (track.durationRange[1] - track.durationRange[0]
-                              | timeFormat)
-                            : ''
-                    }}
-                </td>
-                <td mat-footer-cell *matFooterCellDef>
-                    {{ getThemeDuration() | timeFormat }}
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Actions</th>
-                <td mat-cell *matCellDef="let track" class="actions-container">
-                    <button
-                        mat-mini-fab
-                        type="button"
-                        color="primary"
-                        matTooltip="Editer"
-                        (click)="onEditTrack(track)"
+    <table mat-table [dataSource]="tracks">
+        <ng-container matColumnDef="order">
+            <th mat-header-cell *matHeaderCellDef>N° ordre</th>
+            <td mat-cell *matCellDef="let track">{{ track.order }}</td>
+            <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="artists">
+            <th mat-header-cell *matHeaderCellDef>Artiste(s)</th>
+            <td mat-cell *matCellDef="let track">
+                <span *ngFor="let artist of track.artists; last as last"
+                    >{{ artist }} <span *ngIf="!last"> - </span>
+                </span>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Titre</th>
+            <td mat-cell *matCellDef="let track">{{ track.title }}</td>
+            <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="duration">
+            <th mat-header-cell *matHeaderCellDef>Durée de l'extrait</th>
+            <td mat-cell *matCellDef="let track">
+                {{ track.duration ? (track.duration | timeFormat) : '' }}
+            </td>
+            <td mat-footer-cell *matFooterCellDef>
+                {{ getThemeDuration() | timeFormat }}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let track" class="actions-container">
+                <button
+                    mat-mini-fab
+                    type="button"
+                    color="primary"
+                    matTooltip="Editer"
+                    (click)="onEditTrack(track)"
+                >
+                    <mat-icon aria-label="Supprimer">tune</mat-icon>
+                </button>
+                <button
+                    mat-mini-fab
+                    type="button"
+                    color="warn"
+                    matTooltip="Supprimer"
+                    (click)="onDeleteTrack(track)"
+                >
+                    <mat-icon aria-label="Supprimer">delete</mat-icon>
+                </button>
+                <mat-icon
+                    class="warning"
+                    color="warn"
+                    *ngIf="!track.data_id"
+                    matTooltip="L'extrait audio n'est pas configuré. Editez l'extrait dans le menu Editer"
+                    >warning</mat-icon
+                >
+            </td>
+            <td mat-footer-cell *matFooterCellDef>
+                <button
+                    mat-mini-fab
+                    color="primary"
+                    matTooltip="Ajouter un extrait"
+                    (click)="onAddTrack()"
+                >
+                    <mat-icon aria-label="Ajouter un extrait"
+                        >plus_one</mat-icon
                     >
-                        <mat-icon aria-label="Supprimer">tune</mat-icon>
-                    </button>
-                    <button
-                        mat-mini-fab
-                        type="button"
-                        color="warn"
-                        matTooltip="Supprimer"
-                        (click)="onDeleteTrack(track)"
-                    >
-                        <mat-icon aria-label="Supprimer">delete</mat-icon>
-                    </button>
-                    <mat-icon
-                        class="warning"
-                        color="warn"
-                        *ngIf="!track.dataURI"
-                        matTooltip="L'extrait audio n'est pas configuré. Editez l'extrait dans le menu Editer"
-                        >warning</mat-icon
-                    >
-                </td>
-                <td mat-footer-cell *matFooterCellDef>
-                    <button
-                        mat-mini-fab
-                        color="primary"
-                        matTooltip="Ajouter une chanson"
-                        [disabled]="!trackForm.valid"
-                        (click)="onAddTrack()"
-                    >
-                        <mat-icon aria-label="Ajouter une chanson"
-                            >plus_one</mat-icon
-                        >
-                    </button>
-                </td>
-            </ng-container>
+                </button>
+            </td>
+        </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-            <tr
-                mat-row
-                *matRowDef="let myRowData; columns: columnsToDisplay"
-            ></tr>
-            <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
-        </table>
-    </form>
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+        <tr mat-footer-row *matFooterRowDef="columnsToDisplay"></tr>
+    </table>
 </mat-card>

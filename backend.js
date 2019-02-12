@@ -93,7 +93,7 @@ module.exports = {
                 expressApp.get('/api/track-datas/:trackId', (req, res) => {
                     const oId = new mongoDb.ObjectID(req.params.trackId);
                     dbClient
-                        .collection('track')
+                        .collection('track-data')
                         .findOne({
                             _id: oId,
                         })
@@ -103,7 +103,28 @@ module.exports = {
                                 throw err;
                             }
                         );
-                    res.send(null);
+                });
+                expressApp.post('/api/track-datas', (req, res) => {
+                    dbClient
+                        .collection('track-data')
+                        .insertOne(req.body, (err, result) => {
+                            if (err) throw err;
+                            res.send(result.insertedId);
+                        });
+                    req.body;
+                });
+
+                expressApp.get('/api/track-datas/:trackDataId', (req, res) => {
+                    const oId = new mongoDb.ObjectID(req.params.trackDataId);
+                    dbClient
+                        .collection('track-data')
+                        .findOne({ _id: oId })
+                        .then(
+                            result => res.send(result),
+                            err => {
+                                throw err;
+                            }
+                        );
                 });
                 expressApp.get('/*', function(req, res) {
                     res.sendFile(__dirname + '/dist/blindtest/index.html');

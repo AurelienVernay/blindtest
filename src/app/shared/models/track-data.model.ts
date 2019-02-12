@@ -1,5 +1,4 @@
 export interface TrackData {
+    _id: string;
     base64?: string;
-    offset: number;
-    duration: number;
 }

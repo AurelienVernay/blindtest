@@ -9,5 +9,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 export class ConfirmDeleteItemComponent implements OnInit {
     constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
 
-    ngOnInit() {}
+    ngOnInit() {
+        console.log('confirm delete ', this.data);
+    }
 }

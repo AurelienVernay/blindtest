@@ -1,3 +1,4 @@
+import { EditTrackOption } from './../../shared/models/edit-track-options.model';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -75,33 +76,28 @@ export class ThemeTableComponent implements OnInit {
                     (unorderedTrack, i) => (unorderedTrack.order = i + 1)
                 );
                 this.updateTheme.emit(
-                    new Theme(
-                        [...tracks],
-                        this.theme.name,
-                        this.theme.id,
-                        this.theme.order
-                    )
+                    new Theme([...tracks], this.theme.name, this.theme.order)
                 );
             }
         });
     }
     public onAddTrack() {
-        this.trackForm.controls['order'].enable();
-        this.updateTheme.emit(
-            new Theme(
-                [
-                    ...this.theme.tracks,
-                    {
-                        ...this.trackForm.value,
-                    },
-                ],
-                this.theme.name,
-                this.theme.id,
-                this.theme.order
-            )
-        );
-
-        this.trackForm.controls['order'].disable();
+        const editTrackConfig: EditTrackOption = {
+            mode: 'add',
+            isGloubi: false,
+            trackOrder: this.theme.tracks.length + 1,
+        };
+        this.dialogEdit = this.dialog.open(EditTrackComponent, {
+            data: editTrackConfig,
+        });
+        this.dialogEdit.afterClosed().subscribe(track => {
+            if (track) {
+                this.updateTheme.emit({
+                    ...this.theme,
+                    tracks: [...this.theme.tracks, track],
+                });
+            }
+        });
     }
 
     public onModifyTheme() {
@@ -109,8 +105,13 @@ export class ThemeTableComponent implements OnInit {
     }
 
     public onEditTrack(track: Track) {
+        const editTrackConfig: EditTrackOption = {
+            mode: 'edit',
+            isGloubi: false,
+            track: track,
+        };
         this.dialogEdit = this.dialog.open(EditTrackComponent, {
-            data: { trackId: track._id, isGloubi: false },
+            data: editTrackConfig,
         });
         this.dialogEdit.afterClosed().subscribe(result => {
             if (result) {
@@ -125,7 +126,6 @@ export class ThemeTableComponent implements OnInit {
                             },
                         ],
                         this.theme.name,
-                        this.theme.id,
                         this.theme.order
                     )
                 );
@@ -135,7 +135,7 @@ export class ThemeTableComponent implements OnInit {
     public getThemeDuration() {
         let sum = 0;
         this.theme.tracks.forEach(
-            track => (sum += track.data ? track.data.duration : 0)
+            track => (sum += track.duration ? track.duration : 0)
         );
         return sum;
     }
@@ -150,22 +150,5 @@ export class ThemeTableComponent implements OnInit {
                 this.deleteTheme.emit();
             }
         });
-    }
-
-    public addNewArtistToTrack(event) {
-        if ((event.input.value || '').trim()) {
-            this.trackForm.controls['artists'].setValue([
-                ...this.trackForm.controls['artists'].value,
-                event.input.value,
-            ]);
-            event.input.value = null;
-        }
-    }
-    public removeArtistFromTrack(artist: string) {
-        this.trackForm.controls['artists'].setValue([
-            ...this.trackForm.controls['artists'].value.filter(
-                find => find !== artist
-            ),
-        ]);
     }
 }

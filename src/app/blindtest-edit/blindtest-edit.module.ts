@@ -16,6 +16,6 @@ import { ThemeTableComponent } from './theme-table/theme-table.component';
         EditTrackComponent,
     ],
     entryComponents: [EditTrackComponent, AddThemeFormComponent],
-    imports: [SharedModule],
+    imports: [SharedModule.forRoot()],
 })
 export class BlindtestEditModule {}

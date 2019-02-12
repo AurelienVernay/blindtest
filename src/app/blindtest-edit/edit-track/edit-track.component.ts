@@ -1,13 +1,13 @@
-import { TrackService } from './../../shared/services/track.service';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Howl } from 'howler';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import * as moment from 'moment';
-import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { Track } from '../../shared/models/track.model';
+import { EditTrackOption } from '../../shared/models/edit-track-options.model';
+import { TrackDataService } from './../../shared/services/track-data.service';
 
 @Component({
     selector: 'app-edit-track',
@@ -16,10 +16,14 @@ import { Track } from '../../shared/models/track.model';
 })
 export class EditTrackComponent implements OnInit, OnDestroy {
     public trackForm: FormGroup;
-    private idHowl: number;
-    private howler: Howl;
-    private _previewDuration = 0;
-    private formatter = {
+    public separatorKeysCodes = [ENTER, COMMA];
+    public durationSelected = 0;
+    public loadingFile = false;
+    public loaded = false;
+    public _playing = false;
+    private howl: Howl;
+
+    public formatters = new Array(2).fill({
         from: (string: string): number => {
             return (
                 (string.indexOf('m') > -1
@@ -43,194 +47,175 @@ export class EditTrackComponent implements OnInit, OnDestroy {
                 return `${myDuration.seconds()}s`;
             }
         },
-    };
-    private durationSubscription: Subscription;
-    private dataURISubscription: Subscription;
-    private _playing = false;
-    public formatters = [this.formatter, this.formatter];
+    });
 
-    readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-
-    public get previewDuration() {
-        return this._previewDuration;
-    }
-    public set previewDuration(duration: number) {
-        this._previewDuration = Math.round(duration);
-    }
-    public durationSelected = 0;
-    public track: Track;
-    get playing() {
-        return this._playing;
-    }
-    set playing(play: boolean) {
-        this._playing = play;
-        if (play) {
-            this.generatePreview();
-            this.trackForm.controls['durationRange'].disable();
-            this.idHowl = this.howler.play('preview');
-            this.howler.fade(0, 1, 2000, this.idHowl);
-        } else {
-            this.trackForm.controls['durationRange'].enable();
-            this.howler.stop(this.idHowl);
-        }
-    }
-    public file: File = null;
-    public loading = false;
-    public loaded = false;
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        public data: { trackId: string; isGloubi: boolean },
+        public data: EditTrackOption,
+        public dialogRef: MatDialogRef<EditTrackComponent>,
         private fb: FormBuilder,
-        private trackService: TrackService
-    ) {}
+        private trackDataService: TrackDataService
+    ) {
+        this.trackForm = this.fb.group({
+            order: this.fb.control(null, Validators.required),
+            title: this.fb.control(null, Validators.required),
+            offset: this.fb.control(null, Validators.required),
+            duration: this.fb.control(null, Validators.required),
+            audioDuration: this.fb.control(null, Validators.required),
+            uiSliderControl: this.fb.control([0, 0]),
+            data: this.fb.control(null),
+        });
+        if (!data.isGloubi) {
+            this.trackForm.addControl(
+                'artists',
+                this.fb.array([], Validators.required)
+            );
+        }
+        // translate formControl for NoUISlider to Howler-compatible formControls
+        this.trackForm.get('uiSliderControl').valueChanges.subscribe(value => {
+            this.trackForm.get('offset').setValue(value[0]);
+            this.trackForm.get('duration').setValue(value[1] - value[0]);
+            this.howl = new Howl({
+                src: [this.trackForm.get('data').value],
+                sprite: {
+                    preview: [
+                        this.trackForm.get('offset').value * 1000,
+                        this.trackForm.get('duration').value * 1000,
+                    ],
+                },
+                onend: () => (this.playing = false),
+            });
+        });
+        this.trackForm.get('data').valueChanges.subscribe(value => {
+            if (this.howl) {
+                this.howl.unload();
+            }
+            this.howl = new Howl({
+                src: [value],
+                onload: () => {
+                    this.trackForm
+                        .get('audioDuration')
+                        .setValue(this.howl.duration());
+                    if (this.trackForm.get('duration').value === null) {
+                        this.trackForm
+                            .get('uiSliderControl')
+                            .setValue([0, this.howl.duration()]);
+                    }
+                    this.loadingFile = false;
+                    this.loaded = true;
+                },
+            });
+        });
+    }
 
     ngOnInit() {
-        this.trackForm = this.fb.group({
-            title: this.fb.control(null, Validators.required),
-            data: this.fb.group({
-                base64: this.fb.control(null, Validators.required),
-                offset: this.fb.control(null, Validators.required),
-                duration: this.fb.control(null, Validators.required),
-            }),
-            order: this.fb.control(null),
-            artists: this.fb.control([], Validators.required),
-        });
-        this.trackService.get(this.data.trackId, true).subscribe(track => {
-            this.trackForm.setControl(
-                'data',
-                this.fb.group({
-                    base64: this.fb.control(
-                        track.data.base64,
-                        Validators.required
-                    ),
-                    offset: this.fb.control(
-                        track.data.offset,
-                        Validators.required
-                    ),
-                    duration: this.fb.control(
-                        track.data.duration,
-                        Validators.required
-                    ),
-                })
-            );
+        if (this.data.track) {
+            this.trackForm.get('order').setValue(this.data.track.order);
+            this.trackForm.get('title').setValue(this.data.track.title);
+            this.trackForm
+                .get('uiSliderControl')
+                .setValue([
+                    this.data.track.offset,
+                    this.data.track.offset + this.data.track.duration,
+                ]);
             if (!this.data.isGloubi) {
-                this.trackForm.addControl(
-                    'artists',
-                    this.fb.control(track.artists, Validators.required)
+                const formArray = this.fb.array(
+                    this.data.track.artists.map(artist =>
+                        this.fb.control(artist)
+                    )
                 );
+                this.trackForm.setControl('artists', formArray);
             }
-            this.loading = true;
-            this.computeSound();
-        });
-        this.durationSubscription = this.trackForm.valueChanges.subscribe(
-            values => {
-                if (values.durationRange) {
-                    this.durationSelected =
-                        values.durationRange[1] - values.durationRange[0];
-                }
-            }
-        );
-        this.dataURISubscription = this.trackForm
-            .get('data')
-            .valueChanges.subscribe(() => {
-                this.loading = true;
-                this.computeSound();
-            });
+            this.loadingFile = true;
+            // Call TrackDataService to get base64 Data URI
+            this.trackDataService
+                .get(this.data.track.data_id)
+                .subscribe(trackData => {
+                    this.trackForm.get('data').setValue(trackData.base64);
+                });
+        }
+        if (this.data.trackOrder) {
+            this.trackForm.get('order').setValue(this.data.trackOrder);
+        }
     }
-
-    ngOnDestroy(): void {
-        if (this.durationSubscription) {
-            this.durationSubscription.unsubscribe();
-        }
-        if (this.dataURISubscription) {
-            this.dataURISubscription.unsubscribe();
-        }
-        if (this.howler) {
-            this.howler.unload();
+    ngOnDestroy() {
+        if (this.howl) {
+            this.howl.unload();
         }
     }
 
-    public onFileUploadClicked() {
+    addArtist(event: MatChipInputEvent) {
+        const input = event.input;
+        const value = event.value;
+
+        // Add artist
+        if ((value || '').trim()) {
+            const array = this.trackForm.get('artists') as FormArray;
+            array.push(this.fb.control(event.value));
+        }
+
+        // Reset the input value
+        if (input) {
+            input.value = '';
+        }
+    }
+    removeArtist(index) {
+        const array = this.trackForm.get('artists') as FormArray;
+        array.removeAt(index);
+    }
+    openUploadDialog() {
         document.getElementById('fileInput').click();
-        this.loaded = false;
-        this.previewDuration = null;
     }
-
-    public onFileUploaded(event) {
-        this.file = event.srcElement.files.item(0);
-        if (this.file) {
-            if (this.howler) {
-                this.howler.unload();
-            }
-            this.loading = true;
+    onFileUploaded(event) {
+        const file = event.srcElement.files.item(0);
+        if (file) {
+            this.loadingFile = true;
             const reader = new FileReader();
             reader.addEventListener(
                 'load',
                 () => {
-                    this.trackForm.controls['dataURI'].setValue(reader.result);
+                    this.trackForm.get('data').setValue(reader.result);
                 },
                 false
             );
-            reader.readAsDataURL(this.file);
+            reader.readAsDataURL(file);
         }
     }
-    public togglePlay() {
+
+    togglePlay() {
         this.playing = !this.playing;
     }
 
-    private computeSound() {
-        this.loading = true;
-        this.howler = new Howl({
-            src: [this.trackForm.controls['dataURI'].value],
-            onload: () => {
-                this.previewDuration = this.howler.duration();
-                this.loading = false;
-                this.loaded = true;
-                if (!this.track.data) {
-                    this.trackForm.setControl(
-                        'durationRange',
-                        this.fb.control(
-                            [0, this.howler.duration()],
-                            Validators.required
-                        )
-                    );
-                }
-            },
-        });
+    public get playing() {
+        return this._playing;
     }
-
-    private generatePreview() {
-        this.howler = new Howl({
-            src: [this.trackForm.controls['dataURI'].value],
-            sprite: {
-                preview: [
-                    this.trackForm.controls['durationRange'].value[0] * 1000,
-                    (this.trackForm.controls['durationRange'].value[1] -
-                        this.trackForm.controls['durationRange'].value[0]) *
-                        1000,
-                    false,
-                ],
-            },
-            onend: () => {
-                this.playing = false;
-            },
-        });
-    }
-
-    public addNewArtistToTrack(event) {
-        if ((event.input.value || '').trim()) {
-            this.trackForm.controls['artists'].setValue([
-                ...this.trackForm.controls['artists'].value,
-                event.input.value,
-            ]);
-            event.input.value = null;
+    public set playing(val: boolean) {
+        this._playing = val;
+        if (val) {
+            this.trackForm.get('uiSliderControl').disable();
+            this.howl.play('preview');
+        } else {
+            this.howl.stop();
+            this.trackForm.get('uiSliderControl').enable();
         }
     }
-    public removeArtistFromTrack(artist: string) {
-        this.trackForm.controls['artists'].setValue([
-            ...this.trackForm.controls['artists'].value.filter(
-                find => find !== artist
-            ),
-        ]);
+
+    saveTrack() {
+        let trackData = this.trackForm.get('data').value;
+        if (trackData) {
+            this.trackDataService
+                .add({ _id: null, base64: this.trackForm.get('data').value })
+                .subscribe(trackDataId => {
+                    const track = {
+                        title: this.trackForm.get('title').value,
+                        artists: this.trackForm.get('artists').value,
+                        data_id: trackDataId,
+                        order: this.trackForm.get('order').value,
+                        duration: this.trackForm.get('duration').value,
+                        offset: this.trackForm.get('offset').value,
+                    };
+                    this.dialogRef.close(track);
+                });
+        }
     }
 }

@@ -1,90 +1,123 @@
-<form [formGroup]="trackForm">
-    <h1 mat-dialog-title>
-        Modifier
+<h1 mat-dialog-title>
+    {{ data.mode === 'add' ? 'Ajouter' : 'Modifier' }} un extrait
+</h1>
+
+<form [formGroup]="trackForm" (ngSubmit)="saveTrack()">
+    <mat-dialog-content fxLayout="column">
         <mat-form-field>
-            <input matInput type="text" formControlName="title" />
+            <input
+                matInput
+                type="text"
+                formControlName="title"
+                placeholder="Titre"
+                autocomplete="off"
+            />
         </mat-form-field>
-        <span *ngIf="!data.isGloubi"
-            ><i>par</i>
-            <mat-form-field>
-                <mat-chip-list #chipList>
-                    <mat-chip
-                        *ngFor="
-                            let artist of trackForm.controls['artists'].value
-                        "
-                        [selectable]="true"
-                        [removable]="true"
-                        (removed)="removeArtistFromTrack(artist)"
+        <mat-form-field *ngIf="!isGloubi">
+            <mat-chip-list #chipList>
+                <mat-chip
+                    *ngFor="
+                        let artist of trackForm.controls['artists'].value;
+                        let i = index
+                    "
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="removeArtist(i)"
+                >
+                    {{ artist }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+                <input
+                    placeholder="Artistes"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    [matChipInputAddOnBlur]="true"
+                    (matChipInputTokenEnd)="addArtist($event)"
+                    autocomplete="off"
+                />
+            </mat-chip-list>
+        </mat-form-field>
+
+        <div
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            [ngStyle]="{ 'min-height': '9em' }"
+            *ngIf="loadingFile; else uiControls"
+        >
+            <mat-spinner></mat-spinner>
+        </div>
+        <ng-template #uiControls>
+            <div fxLayout="column">
+                <div
+                    fxLayout="row"
+                    fxLayoutAlign="space-between center"
+                    fxLayoutGap="10px"
+                >
+                    <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="openUploadDialog()"
+                        type="button"
                     >
-                        {{ artist }}
-                        <mat-icon matChipRemove>cancel</mat-icon>
-                    </mat-chip>
+                        <mat-icon>audiotrack</mat-icon> Importer un fichier
+                    </button>
                     <input
-                        placeholder="Artistes..."
-                        [matChipInputFor]="chipList"
-                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                        [matChipInputAddOnBlur]="true"
-                        (matChipInputTokenEnd)="addNewArtistToTrack($event)"
+                        id="fileInput"
+                        type="file"
+                        accept=".mp3,.wav,audio/mpeg,audio/mp4,audio/ogg,audio/vnd.wav"
+                        (change)="onFileUploaded($event)"
+                        style="display:none;"
                     />
-                </mat-chip-list>
-            </mat-form-field>
-        </span>
-    </h1>
-    <mat-dialog-content> </mat-dialog-content>
-    <div class="container">
-        <button
-            mat-raised-button
-            color="primary"
-            (click)="onFileUploadClicked()"
-        >
-            <mat-icon>audiotrack</mat-icon> Importer un fichier
-        </button>
-        <input
-            id="fileInput"
-            type="file"
-            accept=".mp3,.wav,audio/mpeg,audio/mp4,audio/ogg,audio/vnd.wav"
-            (change)="onFileUploaded($event)"
-            style="display:none;"
-        />
-        <mat-spinner *ngIf="loading" [diameter]="30"></mat-spinner>
-        <i
-            *ngIf="!!trackForm.controls.dataURI?.value && previewDuration"
-            class="preview-duration"
-            >Durée de la piste : {{ previewDuration | timeFormat }}</i
-        >
-    </div>
-    <div class="container">
-        <nouislider
-            [ngClass]="'duration-picker'"
-            [ngStyle]="{ padding: '0em 1.7em' }"
-            *ngIf="loaded"
-            [connect]="true"
-            [min]="0"
-            [max]="previewDuration"
-            [tooltips]="formatters"
-            [step]="1"
-            [formControl]="trackForm.controls['durationRange']"
-        ></nouislider>
-        <span *ngIf="loaded" class="preview-play-btn">
-            <button
-                mat-mini-fab
-                color="primary"
-                matTooltip="Aperçu de l'extrait"
-                (click)="togglePlay()"
-            >
-                <mat-icon *ngIf="!playing; else pause">play_arrow</mat-icon>
-                <ng-template #pause> <mat-icon>pause</mat-icon> </ng-template>
-            </button>
-        </span>
-    </div>
-    <i *ngIf="loaded"
-        >Durée selectionnée : {{ durationSelected | timeFormat }}</i
-    >
+                    <i
+                        *ngIf="trackForm.get('audioDuration').valid"
+                        class="preview-duration"
+                        >Durée de la piste :
+                        {{
+                            trackForm.get('audioDuration').value | timeFormat
+                        }}</i
+                    >
+                </div>
+                <div
+                    fxLayout="row"
+                    fxLayoutAlign="start baseline"
+                    fxLayoutGap="10px"
+                    [ngStyle]="{ 'padding-bottom': '1em' }"
+                >
+                    <button
+                        *ngIf="loaded"
+                        fxFlex="10"
+                        mat-mini-fab
+                        color="primary"
+                        matTooltip="Aperçu de l'extrait"
+                        (click)="togglePlay()"
+                        type="button"
+                    >
+                        <mat-icon>
+                            {{ playing ? 'pause' : 'play_arrow' }}</mat-icon
+                        >
+                    </button>
+                    <nouislider
+                        fxFlex="80"
+                        *ngIf="loaded"
+                        [connect]="true"
+                        [min]="0"
+                        [max]="trackForm.get('audioDuration').value"
+                        [tooltips]="formatters"
+                        [step]="1"
+                        [formControl]="trackForm.get('uiSliderControl')"
+                    ></nouislider>
+                </div>
+                <i *ngIf="loaded"
+                    >Durée selectionnée :
+                    {{ trackForm.get('duration').value | timeFormat }}</i
+                >
+            </div>
+        </ng-template>
+    </mat-dialog-content>
     <mat-dialog-actions
         ><button
             mat-raised-button
             color="primary"
-            [mat-dialog-close]="trackForm.value"
             [disabled]="
                 !trackForm.valid || !!trackForm.controls.durationRange?.disabled
             "
@@ -94,6 +127,6 @@
         <button mat-raised-button color="warn" mat-dialog-close>
             <mat-icon>close</mat-icon>
             Annuler
-        </button></mat-dialog-actions
-    >
+        </button>
+    </mat-dialog-actions>
 </form>
