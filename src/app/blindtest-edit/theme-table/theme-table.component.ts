@@ -21,13 +21,13 @@ export class ThemeTableComponent implements OnInit {
     @Input() public theme: Theme;
     public get tracks() {
         return this.theme
-            ? this.theme.tracks.sort((a, b) => a.order - b.order)
+            ? this.theme.tracks.sort((a, b) => a.orderRank - b.orderRank)
             : [];
     }
     public themeForm: FormGroup;
     public trackForm: FormGroup;
     public columnsToDisplay = [
-        'order',
+        'orderRank',
         'artists',
         'title',
         'duration',
@@ -43,10 +43,13 @@ export class ThemeTableComponent implements OnInit {
     ngOnInit() {
         this.themeForm = this.fb.group({
             name: this.fb.control(this.theme.name, Validators.required),
-            order: this.fb.control(this.theme.order, Validators.required),
+            orderRank: this.fb.control(
+                this.theme.orderRank,
+                Validators.required
+            ),
         });
         this.trackForm = this.fb.group({
-            order: this.fb.control(
+            orderRank: this.fb.control(
                 {
                     value: this.theme.tracks.length + 1,
                     disabled: true,
@@ -69,14 +72,14 @@ export class ThemeTableComponent implements OnInit {
             if (confirm) {
                 // filter tracks
                 const tracks: Track[] = this.theme.tracks.filter(
-                    find => find.order !== track.order
-                );
-                // reorder tracks
-                tracks.forEach(
-                    (unorderedTrack, i) => (unorderedTrack.order = i + 1)
+                    find => find.orderRank !== track.orderRank
                 );
                 this.updateTheme.emit(
-                    new Theme([...tracks], this.theme.name, this.theme.order)
+                    new Theme(
+                        [...tracks],
+                        this.theme.name,
+                        this.theme.orderRank
+                    )
                 );
             }
         });
@@ -119,14 +122,14 @@ export class ThemeTableComponent implements OnInit {
                     new Theme(
                         [
                             ...this.theme.tracks.filter(
-                                find => find.order !== track.order
+                                find => find.orderRank !== track.orderRank
                             ),
                             {
                                 ...result,
                             },
                         ],
                         this.theme.name,
-                        this.theme.order
+                        this.theme.orderRank
                     )
                 );
             }

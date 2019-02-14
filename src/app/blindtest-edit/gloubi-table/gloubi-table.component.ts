@@ -20,7 +20,7 @@ export class GloubiTableComponent implements OnInit {
     }
     public get tracks() {
         return this.gloubi
-            ? this.gloubi.tracks.sort((a, b) => a.order - b.order)
+            ? this.gloubi.tracks.sort((a, b) => a.orderRank - b.orderRank)
             : [];
     }
 
@@ -60,7 +60,7 @@ export class GloubiTableComponent implements OnInit {
                 this.updateGloubi.emit(
                     new Theme(
                         this.gloubi.tracks.filter(
-                            find => find.order !== track.order
+                            find => find.orderRank !== track.orderRank
                         ),
                         this.gloubi.name
                     )
@@ -107,14 +107,14 @@ export class GloubiTableComponent implements OnInit {
                     new Theme(
                         [
                             ...this.gloubi.tracks.filter(
-                                find => find.order !== track.order
+                                find => find.orderRank !== track.orderRank
                             ),
                             {
                                 ...result,
                             },
                         ],
                         this.gloubi.name,
-                        this.gloubi.order
+                        this.gloubi.orderRank
                     )
                 );
             }

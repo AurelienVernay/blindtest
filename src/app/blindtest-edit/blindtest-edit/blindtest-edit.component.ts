@@ -40,7 +40,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     public get themes() {
         return !this._themes
             ? []
-            : this._themes.sort((a, b) => a.order - b.order);
+            : this._themes.sort((a, b) => a.orderRank - b.orderRank);
     }
     public set themes(themes: Theme[]) {
         this._themes = themes;
@@ -82,7 +82,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
                 this.blindtest.author,
                 [
                     ...this.blindtest.themes.filter(
-                        find => find.order !== theme.order
+                        find => find.orderRank !== theme.orderRank
                     ),
                     theme,
                 ],
@@ -115,7 +115,11 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
                 this.blindtest._id,
                 this.blindtest.title,
                 this.blindtest.author,
-                [...this.themes.filter(find => find.order !== theme.order)],
+                [
+                    ...this.themes.filter(
+                        find => find.orderRank !== theme.orderRank
+                    ),
+                ],
                 this.blindtest.gloubi
             )
         );

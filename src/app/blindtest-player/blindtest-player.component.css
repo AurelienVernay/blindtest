@@ -32,3 +32,15 @@
 .player-button button {
     margin: 0 0.1em;
 }
+
+.toolbar-player {
+    position: absolute;
+    bottom: 0;
+}
+.player-spinner {
+    position: absolute;
+    left: 10px;
+}
+.data-table {
+    width: 100%;
+}

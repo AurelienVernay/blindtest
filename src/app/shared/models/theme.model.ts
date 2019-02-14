@@ -4,6 +4,6 @@ export class Theme {
     public constructor(
         public tracks?: Track[],
         public name?: string,
-        public order?: number
+        public orderRank?: number
     ) {}
 }

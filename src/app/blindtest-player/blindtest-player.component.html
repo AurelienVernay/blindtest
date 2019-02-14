@@ -1,72 +1,92 @@
-<app-loading-spinner [template]="content"></app-loading-spinner>
+<div class="modal-loading" *ngIf="blindtestLoading; else content">
+    <mat-spinner></mat-spinner>
+    <h1>Chargement...</h1>
+</div>
 <ng-template #content>
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title
-                >Lecture du blindtest {{ blindtest?.title }}</mat-card-title
-            >
-        </mat-card-header>
-        <mat-card-content>
-            Liste de lecture
-            <table mat-table [dataSource]="tracklist">
-                <ng-container matColumnDef="playOrder">
-                    <th mat-header-cell *matHeaderCellDef>N° ordre</th>
-                    <td mat-cell *matCellDef="let track">
-                        {{ track.playOrder }}
-                    </td>
-                </ng-container>
-                <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-                <tr
-                    mat-row
-                    *matRowDef="let track; columns: columnsToDisplay"
-                    [ngClass]="{ selected: track.playOrder === trackSelection }"
-                ></tr>
-            </table>
+    <h1>Lecture du blindtest {{ blindtest?.title }}</h1>
+    <h2>Liste de lecture</h2>
+    <table mat-table [dataSource]="tracklist" class="data-table">
+        <ng-container matColumnDef="playOrder">
+            <th mat-header-cell *matHeaderCellDef>N° d'extrait</th>
+            <td mat-cell *matCellDef="let track">
+                {{ track.playOrder }}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="artists">
+            <th mat-header-cell *matHeaderCellDef>Artiste(s)</th>
+            <td mat-cell *matCellDef="let track">
+                <span *ngFor="let artist of track.artists; last as last"
+                    >{{ artist }} <span *ngIf="!last"> - </span>
+                </span>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Titre</th>
+            <td mat-cell *matCellDef="let track">{{ track.title }}</td>
+            <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr
+            mat-row
+            *matRowDef="let track; columns: columnsToDisplay"
+            [ngClass]="{ selected: track.playOrder === trackSelection }"
+        ></tr>
+    </table>
 
-            <!--<mat-progress-bar
-                mode="determinate"
-                [value]="progress | async"
-            ></mat-progress-bar>-->
-        </mat-card-content>
-        <mat-card-actions>
-            <mat-toolbar [ngStyle]="{ 'justify-content': 'space-around' }">
-                <div class="player-button">
-                    <button
-                        mat-flat-button
-                        matTooltip="Extrait précédent"
-                        [disabled]="trackSelection === 1"
-                        (click)="goToPrevious()"
-                    >
-                        <mat-icon>skip_previous</mat-icon>
-                    </button>
-                    <button
-                        mat-flat-button
-                        color="primary"
-                        [matTooltip]="
-                            (playingSubject | async) ? 'Pause' : 'Lecture'
-                        "
-                        (click)="togglePlay()"
-                    >
-                        <mat-icon *ngIf="!playing; else pause"
-                            >play_arrow</mat-icon
-                        >
-                        <ng-template #pause>
-                            <mat-icon>pause</mat-icon>
-                        </ng-template>
-                    </button>
-                    <button
-                        mat-flat-button
-                        matTooltip="Extrait suivant"
-                        [disabled]="tracklist.length === trackSelection"
-                        (click)="goToNext()"
-                    >
-                        <mat-icon>skip_next</mat-icon>
-                    </button>
-                    <button mat-flat-button color="warn">
-                        <mat-icon>stop</mat-icon>
-                    </button>
-                </div>
-            </mat-toolbar>
-        </mat-card-actions>
-    </mat-card>
+    <button mat-raised-button color="primary" (click)="toggleAnswers()">
+        Afficher les réponses
+    </button>
+    <mat-toolbar
+        class="toolbar-player"
+        fxLayout="row"
+        fxLayoutGap="10px"
+        fxLayoutAlign="center center"
+    >
+        <div class="player-button">
+            <mat-spinner
+                class="player-spinner"
+                [diameter]="40"
+                *ngIf="trackLoading"
+            ></mat-spinner>
+            <button
+                mat-flat-button
+                matTooltip="Extrait précédent"
+                [disabled]="trackSelection === 1"
+                (click)="goToPrevious()"
+            >
+                <mat-icon>skip_previous</mat-icon>
+            </button>
+            <button
+                mat-flat-button
+                color="primary"
+                [matTooltip]="(playingSubject | async) ? 'Pause' : 'Lecture'"
+                (click)="togglePlay()"
+                [disabled]="trackLoading"
+            >
+                <mat-icon *ngIf="!playing; else pause">play_arrow</mat-icon>
+                <ng-template #pause>
+                    <mat-icon>pause</mat-icon>
+                </ng-template>
+            </button>
+            <button
+                mat-flat-button
+                matTooltip="Extrait suivant"
+                [disabled]="tracklist.length === trackSelection"
+                (click)="goToNext()"
+            >
+                <mat-icon>skip_next</mat-icon>
+            </button>
+            <button
+                mat-flat-button
+                color="warn"
+                matTooltip="Arrêter le blindtest"
+                (click)="stop()"
+                [disabled]="!playing"
+            >
+                <mat-icon>stop</mat-icon>
+            </button>
+        </div>
+        <div></div>
+    </mat-toolbar>
 </ng-template>

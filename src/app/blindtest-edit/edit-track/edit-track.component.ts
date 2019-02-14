@@ -3,11 +3,12 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Howl } from 'howler';
 import * as moment from 'moment';
-import { map } from 'rxjs/operators';
 
 import { EditTrackOption } from '../../shared/models/edit-track-options.model';
 import { TrackDataService } from './../../shared/services/track-data.service';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-edit-track',
@@ -110,7 +111,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         if (this.data.track) {
-            this.trackForm.get('order').setValue(this.data.track.order);
+            this.trackForm.get('order').setValue(this.data.track.orderRank);
             this.trackForm.get('title').setValue(this.data.track.title);
             this.trackForm
                 .get('uiSliderControl')
@@ -201,21 +202,29 @@ export class EditTrackComponent implements OnInit, OnDestroy {
     }
 
     saveTrack() {
-        let trackData = this.trackForm.get('data').value;
-        if (trackData) {
-            this.trackDataService
-                .add({ _id: null, base64: this.trackForm.get('data').value })
-                .subscribe(trackDataId => {
-                    const track = {
-                        title: this.trackForm.get('title').value,
-                        artists: this.trackForm.get('artists').value,
-                        data_id: trackDataId,
-                        order: this.trackForm.get('order').value,
-                        duration: this.trackForm.get('duration').value,
-                        offset: this.trackForm.get('offset').value,
-                    };
-                    this.dialogRef.close(track);
-                });
+        let observable: Observable<string>;
+        this.trackForm.disable();
+        if (this.data.track && this.data.track.data_id !== null) {
+            observable = this.trackDataService.update({
+                _id: this.data.track.data_id,
+                base64: this.trackForm.get('data').value,
+            });
+        } else {
+            observable = this.trackDataService.add({
+                _id: null,
+                base64: this.trackForm.get('data').value,
+            });
         }
+        observable.subscribe(trackDataId => {
+            const track = {
+                title: this.trackForm.get('title').value,
+                artists: this.trackForm.get('artists').value,
+                data_id: trackDataId,
+                order: this.trackForm.get('order').value,
+                duration: this.trackForm.get('duration').value,
+                offset: this.trackForm.get('offset').value,
+            };
+            this.dialogRef.close(track);
+        });
     }
 }

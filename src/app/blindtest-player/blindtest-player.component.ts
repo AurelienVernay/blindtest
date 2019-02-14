@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Howl } from 'howler';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { combineLatest, switchMap } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { switchMap, map, tap } from 'rxjs/operators';
 
-import { Blindtest } from '../shared/models/blindtest.model';
-import { Track } from '../shared/models/track.model';
-import { BlindtestService } from '../shared/services/blindtest.service';
+import { Blindtest } from './../shared/models/blindtest.model';
+import { Track } from './../shared/models/track.model';
+import { BlindtestService } from './../shared/services/blindtest.service';
+import { TrackDataService } from './../shared/services/track-data.service';
 
 @Component({
     selector: 'app-blindtest-player',
@@ -14,161 +15,139 @@ import { BlindtestService } from '../shared/services/blindtest.service';
     styleUrls: ['./blindtest-player.component.css'],
 })
 export class BlindtestPlayerComponent implements OnInit, OnDestroy {
-    private _$blindtest: Observable<Blindtest>;
-    private subscription: Subscription;
-    private idPlaying: number;
-
-    private _playing = false;
-    get playing() {
-        return this._playing;
-    }
-    set playing(value: boolean) {
-        this._playing = value;
-        this.playingSubject.next(value);
-    }
-    public playingSubject = new Subject<boolean>();
-    private previousTrackSelection: number;
-    private _trackSelection = 1;
-    get trackSelection() {
+    private blindtest$: Observable<Blindtest>;
+    public blindtestLoading = true;
+    public blindtest: Blindtest;
+    public tracklist: Track[] = [];
+    private showAnswers = false;
+    private playOrderCol = ['playOrder'];
+    private answersCol = ['artists', 'title'];
+    public columnsToDisplay = this.playOrderCol;
+    private _trackSelection: number;
+    private howl: Howl;
+    private idHowl: number;
+    public trackLoading = false;
+    public get trackSelection() {
         return this._trackSelection;
     }
-    set trackSelection(value: number) {
-        this.previousTrackSelection = this._trackSelection;
+    public set trackSelection(value: number) {
         this._trackSelection = value;
-        this.trackSelectionSubject.next(value);
+        this.trackSubject.next(value);
     }
-    public trackSelectionSubject = new Subject<number>();
-
-    private howl: Howl;
-    private _tracklist: Track[] = [];
-    set tracklist(tracks: Track[]) {
-        this._tracklist = tracks;
+    public get trackListIndex(): Track {
+        return this.tracklist[this.trackSelection - 1];
     }
-    get tracklist() {
-        return this._tracklist.sort((a, b) => a.playOrder - b.playOrder);
+    private _playing = false;
+    public get playing() {
+        return this._playing;
     }
-
-    public columnsToDisplay = ['playOrder'];
-    public get $blindtest() {
-        return this._$blindtest;
+    public set playing(val: boolean) {
+        this._playing = val;
+        this.playingSubject.next(val);
     }
-    public set $blindtest(observable: Observable<Blindtest>) {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-        this._$blindtest = observable;
-        this._$blindtest.subscribe(blindtest => {
-            this.loading = true;
-            this.tracklist = [];
-            let count = 1;
-            this.blindtest = blindtest;
-            blindtest.themes.forEach(theme => {
-                theme.tracks.forEach(track => {
-                    track.playOrder = count;
-                    count++;
-                });
-                this.tracklist.push(...theme.tracks);
-            });
-            if (blindtest.gloubi) {
-                blindtest.gloubi.tracks.forEach(track => {
-                    track.playOrder = count;
-                    count++;
-                });
-                this.tracklist.push(...blindtest.gloubi.tracks);
-            }
-            this.subscription = this.trackSelectionSubject
-                .pipe(combineLatest(this.playingSubject))
-                .subscribe(([trackNumber, playing]) => {
-                    if (trackNumber === this.previousTrackSelection) {
-                        if (!playing && this.howl) {
-                            this.howl.pause(this.idPlaying);
-                        }
-                        if (playing && this.howl) {
-                            this.howl.play(this.idPlaying || 'preview');
-                        }
-                    } else {
-                        if (this.howl) {
-                            this.howl.unload();
-                        }
-                        const track = this.tracklist[trackNumber - 1];
-                        //TODO track.data.base64
-                        this.howl = new Howl({
-                            src: null,
-                            sprite: {
-                                preview: [
-                                    track.offset * 1000,
-                                    track.duration * 1000,
-                                ],
-                            },
-                            onload: () => {
-                                console.log('audio loaded', trackNumber);
-                                if (playing) {
-                                    console.log('playing', trackNumber);
-                                    this.idPlaying = this.howl.play('preview');
-                                }
-                            },
-                            onend: () => {
-                                console.log('audio ended');
-                                if (trackNumber === this.tracklist.length) {
-                                    this.playing = false;
-                                    this.idPlaying = null;
-                                    this.trackSelection = 1;
-                                    console.log('blindtest ended ! ');
-                                } else {
-                                    console.log('go to next');
-                                    this.trackSelection++;
-                                }
-                            },
-                            onloaderror: (id, error) =>
-                                console.error(id, error),
-                            onplayerror: (id, error) =>
-                                console.error(id, error),
-                        });
-                    }
-                });
-            // init first song
-            this.playing = false;
-            this.trackSelectionSubject.next(1);
-            this.loading = false;
-        });
-    }
-    public progress: Observable<number> = Observable.create(observer => {});
-    public blindtest: Blindtest;
-    public loading = true;
+    private trackSubject = new Subject<number>();
+    public playingSubject = new Subject<boolean>();
+    private howlLoadedSubject = new Subject<Howl>();
 
     constructor(
+        private blindtestService: BlindtestService,
         private route: ActivatedRoute,
-        public btService: BlindtestService
+        private trackDataService: TrackDataService
     ) {}
-
     ngOnInit() {
-        this.$blindtest = this.route.paramMap.pipe(
+        this.blindtest$ = this.route.paramMap.pipe(
             switchMap((params: ParamMap) =>
-                this.btService.get(params.get('id'))
+                this.blindtestService.get(params.get('id'))
             )
         );
+        this.trackSubject
+            .pipe(
+                tap(() => (this.trackLoading = true)),
+                switchMap((index: number) =>
+                    this.trackDataService.get(this.tracklist[index - 1].data_id)
+                )
+            )
+            .subscribe(trackData => {
+                this.idHowl = null;
+                if (this.howl && this.howl.playing()) {
+                    this.howl.stop();
+                }
+                this.howl = new Howl({
+                    src: [trackData.base64],
+                    sprite: {
+                        extract: [
+                            this.trackListIndex.offset * 1000,
+                            (this.trackListIndex.offset +
+                                this.trackListIndex.duration) *
+                                1000,
+                        ],
+                    },
+                    onend: () => {
+                        if (this.trackSelection < this.tracklist.length) {
+                            this.goToNext();
+                        } else {
+                            this.stop();
+                        }
+                    },
+                    onload: () => this.howlLoadedSubject.next(this.howl),
+                });
+            });
+        this.howlLoadedSubject.subscribe(() => (this.trackLoading = false));
+        combineLatest(this.howlLoadedSubject, this.playingSubject).subscribe(
+            ([howl, playing]) => {
+                if (playing) {
+                    this.idHowl = howl.play(this.idHowl || 'extract');
+                } else {
+                    howl.pause(this.idHowl);
+                }
+            }
+        );
+        this.blindtest$.subscribe(result => {
+            this.blindtest = result;
+            this.blindtest.themes.forEach(
+                theme =>
+                    (this.tracklist = [
+                        ...this.tracklist,
+                        ...theme.tracks
+                            .map(elem => ({
+                                ...elem,
+                                playOrder:
+                                    this.tracklist.length + elem.orderRank,
+                            }))
+                            .sort((a, b) => a.orderRank - b.orderRank),
+                    ])
+            );
+            this.trackSelection = 1;
+            this.blindtestLoading = false;
+        });
     }
-
     ngOnDestroy(): void {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
+        if (this.howl) {
+            this.howl.unload();
         }
-        Howler.unload();
-        this.playingSubject.unsubscribe();
-        this.trackSelectionSubject.unsubscribe();
     }
 
     togglePlay() {
-        console.log('play / pause');
         this.playing = !this.playing;
     }
 
     goToPrevious() {
-        console.log('go to previous');
         this.trackSelection--;
     }
+
     goToNext() {
-        console.log('go to next');
         this.trackSelection++;
+    }
+    stop() {
+        this.playing = false;
+        this.trackSelection = 1;
+    }
+    toggleAnswers() {
+        if (this.showAnswers) {
+            this.columnsToDisplay = [...this.playOrderCol];
+        } else {
+            this.columnsToDisplay = [...this.playOrderCol, ...this.answersCol];
+        }
+        this.showAnswers = !this.showAnswers;
     }
 }

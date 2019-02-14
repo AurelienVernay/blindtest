@@ -48,21 +48,67 @@ module.exports = {
                 });
 
                 expressApp.put('/api/blindtests/:blindtestId', (req, res) => {
-                    console.log(
-                        'updating blindtest id ',
-                        req.params.blindtestId,
-                        'with body ',
-                        req.body
-                    );
                     const oId = new mongoDb.ObjectID(req.params.blindtestId);
-                    dbClient.collection('blindtest').replaceOne(
-                        { _id: oId },
-                        {
-                            title: req.body.title,
-                            author: req.body.author,
-                            themes: req.body.themes,
-                        },
-                        () =>
+                    dbClient
+                        .collection('blindtest')
+                        .findOne({ _id: oId }, (err, result) => {
+                            if (err) {
+                                throw err;
+                            }
+                            result.themes.forEach(existingTheme => {
+                                const idx = req.body.themes.findIndex(
+                                    theme =>
+                                        theme.orderRank ===
+                                        existingTheme.orderRank
+                                );
+                                // case of deleting a theme
+                                if (idx === -1) {
+                                    existingTheme.tracks.forEach(track =>
+                                        dbClient
+                                            .collection('track-data')
+                                            .deleteOne({ _id: track.data_id })
+                                    );
+                                } else {
+                                    // check if a track has been deleted
+                                    const newTracks =
+                                        req.body.themes[idx].tracks;
+                                    existingTheme.tracks.forEach(track => {
+                                        const trackIdx = newTracks.findIndex(
+                                            newTrack =>
+                                                newTrack.orderRank ===
+                                                track.orderRank
+                                        );
+                                        if (trackIdx === -1) {
+                                            const trackOId = new mongoDb.ObjectID(
+                                                track.data_id
+                                            );
+                                            dbClient
+                                                .collection('track-data')
+                                                .deleteOne(
+                                                    { _id: trackOId },
+                                                    (err, result) => {
+                                                        if (err) {
+                                                            throw err;
+                                                        }
+                                                        console.log(result);
+                                                    }
+                                                );
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    //reorder tracks
+                    req.body.themes.forEach(theme =>
+                        theme.tracks.forEach(
+                            (track, i) => (track.orderRank = i + 1)
+                        )
+                    );
+                    console.log(req.body.themes);
+                    // replace blindtest with new datas
+                    dbClient
+                        .collection('blindtest')
+                        .replaceOne({ _id: oId }, req.body, () =>
                             dbClient
                                 .collection('blindtest')
                                 .findOne({ _id: oId })
@@ -74,8 +120,7 @@ module.exports = {
                                         throw err;
                                     }
                                 )
-
-                    );
+                        );
                 });
 
                 expressApp.delete(
@@ -84,7 +129,7 @@ module.exports = {
                         const oId = new mongoDb.ObjectID(
                             req.params.blindtestId
                         );
-                        MongoClient.collection('blindtest').delete({
+                        dbClient.collection('blindtest').deleteOne({
                             _id: oId,
                         });
                         res.sendStatus(200);
@@ -111,9 +156,24 @@ module.exports = {
                             if (err) throw err;
                             res.send(result.insertedId);
                         });
-                    req.body;
                 });
-
+                expressApp.put('/api/track-datas/:trackId', (req, res) => {
+                    const oId = new mongoDb.ObjectID(req.params.trackId);
+                    dbClient
+                        .collection('track-data')
+                        .replaceOne(
+                            {
+                                _id: oId,
+                            },
+                            { base64: req.body.base64 }
+                        )
+                        .then(
+                            result => res.send(oId),
+                            err => {
+                                throw err;
+                            }
+                        );
+                });
                 expressApp.get('/api/track-datas/:trackDataId', (req, res) => {
                     const oId = new mongoDb.ObjectID(req.params.trackDataId);
                     dbClient

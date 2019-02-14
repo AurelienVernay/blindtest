@@ -10,7 +10,7 @@
                             type="number"
                             min="1"
                             max="99"
-                            formControlName="order"
+                            formControlName="orderRank"
                         />
                     </mat-form-field>
                     :
@@ -19,7 +19,8 @@
                     </mat-form-field>
                     <button
                         *ngIf="
-                            themeForm.controls['order'].value !== theme.order ||
+                            themeForm.get('orderRank').value !==
+                                theme.orderRank ||
                             themeForm.controls['name'].value !== theme.name
                         "
                         mat-raised-button
@@ -42,9 +43,9 @@
         </mat-toolbar>
     </mat-card-header>
     <table mat-table [dataSource]="tracks">
-        <ng-container matColumnDef="order">
+        <ng-container matColumnDef="orderRank">
             <th mat-header-cell *matHeaderCellDef>N° ordre</th>
-            <td mat-cell *matCellDef="let track">{{ track.order }}</td>
+            <td mat-cell *matCellDef="let track">{{ track.orderRank }}</td>
             <td mat-footer-cell *matFooterCellDef></td>
         </ng-container>
         <ng-container matColumnDef="artists">

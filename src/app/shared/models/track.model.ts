@@ -1,6 +1,6 @@
 export class Track {
     _id: string;
-    order?: number;
+    orderRank?: number;
     artists?: string[];
     title: string;
     playOrder?: number;

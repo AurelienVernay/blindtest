@@ -19,15 +19,15 @@ export class TrackDataService {
         );
     }
 
-    public update(trackData: TrackData): Observable<TrackData> {
-        return this.http.put<TrackData>(
+    public update(trackData: TrackData): Observable<string> {
+        return this.http.put<string>(
             `${this.cfgService.paths.api}/track-datas/${trackData._id}`,
             trackData
         );
     }
 
-    public add(trackData: TrackData): Observable<TrackData> {
-        return this.http.post<TrackData>(
+    public add(trackData: TrackData): Observable<string> {
+        return this.http.post<string>(
             `${this.cfgService.paths.api}/track-datas`,
             trackData
         );
