@@ -4,8 +4,8 @@ import { Howl } from 'howler';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { switchMap, map, tap } from 'rxjs/operators';
 
-import { Blindtest } from './../shared/models/blindtest.model';
-import { Track } from './../shared/models/track.model';
+import { Blindtest } from '../../../interfaces/blindtest.model';
+import { Track } from '../../../interfaces/track.model';
 import { BlindtestService } from './../shared/services/blindtest.service';
 import { TrackDataService } from './../shared/services/track-data.service';
 

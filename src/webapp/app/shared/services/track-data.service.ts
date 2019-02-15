@@ -2,7 +2,7 @@ import { ConfigService } from './config.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TrackData } from '../models/track-data.model';
+import { TrackData } from '../../../../interfaces/track-data.model';
 
 @Injectable({
     providedIn: 'root',

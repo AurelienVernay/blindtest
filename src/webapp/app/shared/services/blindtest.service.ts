@@ -1,5 +1,5 @@
 import { ConfigService } from './config.service';
-import { Blindtest } from './../models/blindtest.model';
+import { Blindtest } from '../../../../interfaces/blindtest.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';

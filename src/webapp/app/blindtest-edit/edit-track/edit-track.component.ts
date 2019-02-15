@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Howl } from 'howler';
 import * as moment from 'moment';
 
-import { EditTrackOption } from '../../shared/models/edit-track-options.model';
+import { EditTrackOption } from '../../../../interfaces/edit-track-options.model';
 import { TrackDataService } from './../../shared/services/track-data.service';
 import { Observable } from 'rxjs';
 

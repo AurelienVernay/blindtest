@@ -1,12 +1,12 @@
-import { EditTrackOption } from './../../shared/models/edit-track-options.model';
+import { EditTrackOption } from '../../../../interfaces/edit-track-options.model';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { ConfirmDeleteItemComponent } from '../../shared/confirm-delete-item/confirm-delete-item.component';
-import { Theme } from '../../shared/models/theme.model';
-import { Track } from '../../shared/models/track.model';
+import { Theme } from '../../../../interfaces/theme.model';
+import { Track } from '../../../../interfaces/track.model';
 import { EditTrackComponent } from './../edit-track/edit-track.component';
 
 @Component({

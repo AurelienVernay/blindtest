@@ -1,5 +1,5 @@
 import { CreateBlindtestFormComponent } from './../create-blindtest-form/create-blindtest-form.component';
-import { Blindtest } from '../../shared/models/blindtest.model';
+import { Blindtest } from '../../../../interfaces/blindtest.model';
 import { BlindtestService } from '../../shared/services/blindtest.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
