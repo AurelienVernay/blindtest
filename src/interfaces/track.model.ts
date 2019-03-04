@@ -1,4 +1,4 @@
-export class Track {
+export interface ITrack {
     _id: string;
     orderRank?: number;
     artists?: string[];

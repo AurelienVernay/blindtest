@@ -4,8 +4,8 @@ import { Howl } from 'howler';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { switchMap, map, tap } from 'rxjs/operators';
 
-import { Blindtest } from '../../../interfaces/blindtest.model';
-import { Track } from '../../../interfaces/track.model';
+import { IBlindtest } from '../../../interfaces/blindtest.interface';
+import { ITrack } from '../../../interfaces/track.model';
 import { BlindtestService } from './../shared/services/blindtest.service';
 import { TrackDataService } from './../shared/services/track-data.service';
 
@@ -15,10 +15,10 @@ import { TrackDataService } from './../shared/services/track-data.service';
     styleUrls: ['./blindtest-player.component.css'],
 })
 export class BlindtestPlayerComponent implements OnInit, OnDestroy {
-    private blindtest$: Observable<Blindtest>;
+    private blindtest$: Observable<IBlindtest>;
     public blindtestLoading = true;
-    public blindtest: Blindtest;
-    public tracklist: Track[] = [];
+    public blindtest: IBlindtest;
+    public tracklist: ITrack[] = [];
     private showAnswers = false;
     private playOrderCol = ['playOrder'];
     private answersCol = ['artists', 'title'];
@@ -34,7 +34,7 @@ export class BlindtestPlayerComponent implements OnInit, OnDestroy {
         this._trackSelection = value;
         this.trackSubject.next(value);
     }
-    public get trackListIndex(): Track {
+    public get trackListIndex(): ITrack {
         return this.tracklist[this.trackSelection - 1];
     }
     private _playing = false;

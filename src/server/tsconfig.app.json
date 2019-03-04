@@ -1,9 +1,0 @@
-{
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../../server",
-        "types": []
-    },
-    "include": ["./**"],
-    "exclude": ["test.ts", "**/*.spec.ts"]
-}

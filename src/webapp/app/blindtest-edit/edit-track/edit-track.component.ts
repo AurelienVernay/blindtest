@@ -5,10 +5,10 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Howl } from 'howler';
 import * as moment from 'moment';
-
-import { EditTrackOption } from '../../../../interfaces/edit-track-options.model';
-import { TrackDataService } from './../../shared/services/track-data.service';
 import { Observable } from 'rxjs';
+
+import { EditTrackOption } from '../../shared/models/edit-track-options.interfacel';
+import { TrackDataService } from './../../shared/services/track-data.service';
 
 @Component({
     selector: 'app-edit-track',

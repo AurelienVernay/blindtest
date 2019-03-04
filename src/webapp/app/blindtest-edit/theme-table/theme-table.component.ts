@@ -1,12 +1,13 @@
-import { EditTrackOption } from '../../../../interfaces/edit-track-options.model';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
+import { EditTrackOption } from '../../shared/models/edit-track-options.interfacel';
+import { ITheme } from 'src/interfaces/theme.interface';
+import { ITrack } from 'src/interfaces/track.model';
 import { ConfirmDeleteItemComponent } from '../../shared/confirm-delete-item/confirm-delete-item.component';
-import { Theme } from '../../../../interfaces/theme.model';
-import { Track } from '../../../../interfaces/track.model';
+import { Theme } from '../../shared/models/theme.model';
 import { EditTrackComponent } from './../edit-track/edit-track.component';
 
 @Component({
@@ -18,7 +19,7 @@ export class ThemeTableComponent implements OnInit {
     private dialogEdit: MatDialogRef<EditTrackComponent>;
     private dialogConfirmDelete: MatDialogRef<ConfirmDeleteItemComponent>;
     readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-    @Input() public theme: Theme;
+    @Input() public theme: ITheme;
     public get tracks() {
         return this.theme
             ? this.theme.tracks.sort((a, b) => a.orderRank - b.orderRank)
@@ -34,7 +35,7 @@ export class ThemeTableComponent implements OnInit {
         'actions',
     ];
 
-    @Output() updateTheme = new EventEmitter<Theme>();
+    @Output() updateTheme = new EventEmitter<ITheme>();
 
     @Output() deleteTheme = new EventEmitter();
 
@@ -61,7 +62,7 @@ export class ThemeTableComponent implements OnInit {
         });
     }
 
-    public onDeleteTrack(track: Track) {
+    public onDeleteTrack(track: ITrack) {
         this.dialogConfirmDelete = this.dialog.open(
             ConfirmDeleteItemComponent,
             {
@@ -71,7 +72,7 @@ export class ThemeTableComponent implements OnInit {
         this.dialogConfirmDelete.afterClosed().subscribe(confirm => {
             if (confirm) {
                 // filter tracks
-                const tracks: Track[] = this.theme.tracks.filter(
+                const tracks: ITrack[] = this.theme.tracks.filter(
                     find => find.orderRank !== track.orderRank
                 );
                 this.updateTheme.emit(
@@ -107,7 +108,7 @@ export class ThemeTableComponent implements OnInit {
         this.updateTheme.emit({ ...this.theme, ...this.themeForm.value });
     }
 
-    public onEditTrack(track: Track) {
+    public onEditTrack(track: ITrack) {
         const editTrackConfig: EditTrackOption = {
             mode: 'edit',
             isGloubi: false,

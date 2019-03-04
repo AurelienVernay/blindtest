@@ -5,7 +5,7 @@
             "type": "node",
             "request": "launch",
             "name": "Debug backend",
-            "program": "${workspaceFolder}/main.js",
+            "program": "${workspaceFolder}/dist/server/main.js",
             "args": ["--backend"]
         },
         {

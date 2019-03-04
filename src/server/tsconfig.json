@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "outDir": "../../dist",
+        "types": [],
+        "lib": ["es2018", "dom"]
+    },
+    "include": ["./**/*"],
+    "exclude": ["test.ts", "**/*.spec.ts"]
+}

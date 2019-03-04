@@ -3,7 +3,7 @@ import { filter } from 'rxjs/operators';
 import { app, BrowserWindow } from 'electron';
 //main.ts bootstrap server and electron according to args
 let win;
-const server = new BlindtestServer();
+const server = BlindtestServer.bootstrap();
 if (!process.argv.findIndex(arg => arg === '--backend')) {
     // bootstrapping Electron
     server.ready.pipe(filter(ready => ready)).subscribe(() => {

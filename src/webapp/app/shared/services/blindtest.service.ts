@@ -1,5 +1,5 @@
 import { ConfigService } from './config.service';
-import { Blindtest } from '../../../../interfaces/blindtest.model';
+import { IBlindtest } from '../../../../interfaces/blindtest.interface';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,27 +13,27 @@ export class BlindtestService {
         private cfgService: ConfigService
     ) {}
 
-    public getAll(): Observable<Blindtest[]> {
-        return this.http.get<Blindtest[]>(
+    public getAll(): Observable<IBlindtest[]> {
+        return this.http.get<IBlindtest[]>(
             `${this.cfgService.paths.api}/blindtests`
         );
     }
 
-    public get(id: string): Observable<Blindtest> {
-        return this.http.get<Blindtest>(
+    public get(id: string): Observable<IBlindtest> {
+        return this.http.get<IBlindtest>(
             `${this.cfgService.paths.api}/blindtests/${id}`
         );
     }
 
-    public update(blindtest: Blindtest): Observable<Blindtest> {
-        return this.http.put<Blindtest>(
+    public update(blindtest: IBlindtest): Observable<IBlindtest> {
+        return this.http.put<IBlindtest>(
             `${this.cfgService.paths.api}/blindtests/${blindtest._id}`,
             blindtest
         );
     }
 
-    public add(blindtest: Blindtest): Observable<Blindtest> {
-        return this.http.post<Blindtest>(
+    public add(blindtest: IBlindtest): Observable<IBlindtest> {
+        return this.http.post<IBlindtest>(
             `${this.cfgService.paths.api}/blindtests`,
             blindtest
         );

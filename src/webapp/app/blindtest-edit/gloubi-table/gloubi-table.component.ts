@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { ConfirmDeleteItemComponent } from '../../shared/confirm-delete-item/confirm-delete-item.component';
-import { Theme } from '../../../../interfaces/theme.model';
-import { Track } from '../../../../interfaces/track.model';
+import { ITheme } from '../../../../interfaces/theme.interface';
+import { ITrack } from '../../../../interfaces/track.model';
 import { EditTrackComponent } from './../edit-track/edit-track.component';
+import { Theme } from '../../shared/models/theme.model';
 
 @Component({
     selector: 'app-gloubi-table',
@@ -14,7 +15,7 @@ import { EditTrackComponent } from './../edit-track/edit-track.component';
 })
 export class GloubiTableComponent implements OnInit {
     private dialogEdit: MatDialogRef<EditTrackComponent>;
-    private _gloubi: Theme;
+    private _gloubi: ITheme;
     public get gloubi() {
         return this._gloubi;
     }
@@ -25,7 +26,7 @@ export class GloubiTableComponent implements OnInit {
     }
 
     @Input()
-    public set gloubi(gloubi: Theme) {
+    public set gloubi(gloubi: ITheme) {
         this._gloubi = gloubi;
         this.gloubiForm = this.fb.group({
             title: this.fb.control(null, Validators.required),
@@ -39,7 +40,7 @@ export class GloubiTableComponent implements OnInit {
         });
         this.gloubiForm.markAsPristine();
     }
-    @Output() updateGloubi = new EventEmitter<Theme>();
+    @Output() updateGloubi = new EventEmitter<ITheme>();
     @Output() deleteGloubi = new EventEmitter();
     public columnsToDisplay = ['order', 'title', 'actions'];
     public gloubiForm: FormGroup;
@@ -48,7 +49,7 @@ export class GloubiTableComponent implements OnInit {
 
     ngOnInit() {}
 
-    public deleteTrack(track: Track) {
+    public deleteTrack(track: ITrack) {
         this.dialogCOnfirmDelete = this.dialog.open(
             ConfirmDeleteItemComponent,
             {
@@ -97,7 +98,7 @@ export class GloubiTableComponent implements OnInit {
         });
     }
 
-    public editTrack(track: Track) {
+    public editTrack(track: ITrack) {
         this.dialogEdit = this.dialog.open(EditTrackComponent, {
             data: { track: track, isGloubi: true },
         });

@@ -1,5 +1,5 @@
 import { CreateBlindtestFormComponent } from './../create-blindtest-form/create-blindtest-form.component';
-import { Blindtest } from '../../../../interfaces/blindtest.model';
+import { IBlindtest } from '../../../../interfaces/blindtest.interface';
 import { BlindtestService } from '../../shared/services/blindtest.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
@@ -26,7 +26,7 @@ export class BlindtestsListComponent implements OnInit {
             .subscribe(blindtests => (this.blindtests = blindtests));
     }
 
-    public viewBlindtest(blindtest: Blindtest) {
+    public viewBlindtest(blindtest: IBlindtest) {
         this.router.navigate([`blindtest/${blindtest._id}`]);
     }
     public addNewBlindtest() {
