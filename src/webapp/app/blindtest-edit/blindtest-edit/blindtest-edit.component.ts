@@ -1,15 +1,16 @@
-import { Gloubi } from './../../shared/models/gloubi.model';
-import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.component';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ITheme } from '../../../../interfaces/theme.interface';
-import { BlindtestService } from '../../shared/services/blindtest.service';
-import { IBlindtest } from '../../../../interfaces/blindtest.interface';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
 import { Observable, Subscription } from 'rxjs';
-import { MatDialogRef, MatDialog } from '@angular/material/dialog';
+import { switchMap } from 'rxjs/operators';
+
+import { ITheme } from '../../../../interfaces/theme.interface';
 import { Theme } from '../../shared/models/theme.model';
+import { BlindtestService } from '../../shared/services/blindtest.service';
+import { AddThemeFormComponent } from '../add-theme-form/add-theme-form.component';
+import { Blindtest } from './../../shared/models/blindtest.model';
+import { Gloubi } from './../../shared/models/gloubi.model';
 
 @Component({
     selector: 'app-blindtest-edit',
@@ -17,12 +18,12 @@ import { Theme } from '../../shared/models/theme.model';
     styleUrls: ['./blindtest-edit.component.css'],
 })
 export class BlindtestEditComponent implements OnInit, OnDestroy {
-    private _$blindtest: Observable<IBlindtest>;
+    private _$blindtest: Observable<Blindtest>;
     private subscription: Subscription;
-    public get $blindtest() {
+    public get blindtest$() {
         return this._$blindtest;
     }
-    public set $blindtest(observable: Observable<IBlindtest>) {
+    public set blindtest$(observable: Observable<Blindtest>) {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -37,7 +38,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
             });
         });
     }
-    public blindtest: IBlindtest;
+    public blindtest: Blindtest;
     private _themes: ITheme[];
     public get themes() {
         return !this._themes
@@ -63,7 +64,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.$blindtest = this.route.paramMap.pipe(
+        this.blindtest$ = this.route.paramMap.pipe(
             switchMap((params: ParamMap) =>
                 this.btService.get(params.get('id'))
             )
@@ -77,7 +78,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     }
 
     public onUpdateTheme(theme: ITheme) {
-        this.$blindtest = this.btService.update({
+        this.blindtest$ = this.btService.update({
             _id: this.blindtest._id,
             title: this.blindtest.title,
             author: this.blindtest.author,
@@ -94,7 +95,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
         this.dialogRef = this.dialog.open(AddThemeFormComponent);
         this.dialogRef.afterClosed().subscribe(themeName => {
             if (themeName) {
-                this.$blindtest = this.btService.update({
+                this.blindtest$ = this.btService.update({
                     _id: this.blindtest._id,
                     title: this.blindtest.title,
                     author: this.blindtest.author,
@@ -108,7 +109,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     }
 
     public onDeleteTheme(theme: ITheme) {
-        this.$blindtest = this.btService.update({
+        this.blindtest$ = this.btService.update({
             _id: this.blindtest._id,
             title: this.blindtest.title,
             author: this.blindtest.author,
@@ -121,7 +122,7 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
         });
     }
     public onAddGloubi() {
-        this.$blindtest = this.btService.update({
+        this.blindtest$ = this.btService.update({
             _id: this.blindtest._id,
             title: this.blindtest.title,
             author: this.blindtest.author,
@@ -131,13 +132,13 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     }
 
     public onUpdateBlindtest() {
-        this.$blindtest = this.btService.update({
+        this.blindtest$ = this.btService.update({
             ...this.blindtest,
             ...this.blindtestForm.value,
         });
     }
     public onUpdateGloubi(gloubi: ITheme) {
-        this.$blindtest = this.btService.update({
+        this.blindtest$ = this.btService.update({
             _id: this.blindtest._id,
             title: this.blindtest.title,
             author: this.blindtest.author,
@@ -147,6 +148,6 @@ export class BlindtestEditComponent implements OnInit, OnDestroy {
     }
     public onDeleteGloubi() {
         delete this.blindtest.gloubi;
-        this.$blindtest = this.btService.update(this.blindtest);
+        this.blindtest$ = this.btService.update(this.blindtest);
     }
 }

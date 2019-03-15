@@ -1,3 +1,4 @@
+import { TrackData } from './../models/track-data.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -14,21 +15,21 @@ export class TrackDataService {
         private cfgService: ConfigService
     ) {}
 
-    public get(id: string): Observable<ITrackData> {
-        return this.http.get<ITrackData>(
+    public get(id: string): Observable<TrackData> {
+        return this.http.get<TrackData>(
             `${this.cfgService.paths.api}/track-datas/${id}`
         );
     }
 
-    public update(trackData: ITrackData): Observable<string> {
-        return this.http.put<string>(
+    public update(trackData: TrackData): Observable<TrackData> {
+        return this.http.put<TrackData>(
             `${this.cfgService.paths.api}/track-datas/${trackData._id}`,
             trackData
         );
     }
 
-    public add(trackData: ITrackData): Observable<string> {
-        return this.http.post<string>(
+    public add(trackData: TrackData): Observable<TrackData> {
+        return this.http.post<TrackData>(
             `${this.cfgService.paths.api}/track-datas`,
             trackData
         );

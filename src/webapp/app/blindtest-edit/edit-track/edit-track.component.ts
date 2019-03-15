@@ -1,3 +1,4 @@
+import { TrackData } from './../../shared/models/track-data.model';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -202,7 +203,7 @@ export class EditTrackComponent implements OnInit, OnDestroy {
     }
 
     saveTrack() {
-        let observable: Observable<string>;
+        let observable: Observable<TrackData>;
         this.trackForm.disable();
         if (this.data.track && this.data.track.data_id !== null) {
             observable = this.trackDataService.update({

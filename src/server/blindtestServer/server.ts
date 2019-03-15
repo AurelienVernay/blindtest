@@ -22,6 +22,7 @@ export class BlindtestServer {
         this.connection = mongoose.createConnection(MONGODB_URLCONNECTION, {
             useNewUrlParser: true,
         });
+        console.log('test');
         this.model.blindtest = this.connection.model<IBlindtestModel>(
             'Blindtest',
             BlindtestSchema

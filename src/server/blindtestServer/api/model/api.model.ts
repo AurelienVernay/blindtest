@@ -102,12 +102,15 @@ export abstract class ApiModelFactory<T extends mongoose.Document> {
     ) {
         console.log(`registering ${this.collectionName} delete listener`);
         router.delete(`/:id`, (req, res) => {
-            model
-                .findByIdAndDelete(req.params.id)
-                .then(
-                    () => res.sendStatus(200),
-                    error => res.status(500).json({ error: error })
-                );
+            model.findByIdAndDelete(req.params.id).then(
+                sucess => {
+                    console.log(sucess);
+                    res.json(sucess);
+                },
+                error => {
+                    res.status(500).json({ error: error });
+                }
+            );
         });
     }
 }

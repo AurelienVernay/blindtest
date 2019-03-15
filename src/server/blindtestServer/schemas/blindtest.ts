@@ -8,8 +8,9 @@ export interface IBlindtestModel extends IBlindtest, Document {
 export const BlindtestSchema: Schema = new Schema({
     title: String,
     author: String,
-    themes: [
-        {
+    themes: {
+        type: Map,
+        of: {
             name: String,
             tracks: [
                 {
@@ -21,10 +22,16 @@ export const BlindtestSchema: Schema = new Schema({
                 },
             ],
         },
-    ],
+    },
     gloubi: {
-        name: String,
-        tracks: [],
+        type: new Schema(
+            {
+                name: String,
+                tracks: [],
+            },
+            {}
+        ),
+        required: false,
     },
 });
 /**

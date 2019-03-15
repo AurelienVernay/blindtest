@@ -5,7 +5,7 @@
                 <h1>Liste des blindtests enregistrés</h1>
             </mat-toolbar>
         </mat-card-header>
-        <table mat-table [dataSource]="blindtests">
+        <table mat-table [dataSource]="blindtests$">
             <ng-container matColumnDef="blindtestName">
                 <th mat-header-cell *matHeaderCellDef>Nom</th>
                 <td mat-cell *matCellDef="let blindtest">
@@ -38,6 +38,14 @@
                         routerLink="/blindtest/{{ blindtest._id }}/play"
                     >
                         <mat-icon>play_arrow</mat-icon>
+                    </button>
+                    <button
+                        mat-mini-fab
+                        color="warn"
+                        matTooltip="Supprimer le blindtest"
+                        (click)="onDeleteBlindtest(blindtest)"
+                    >
+                        <mat-icon>delete</mat-icon>
                     </button>
                 </td>
                 <td mat-footer-cell *matFooterCellDef>
